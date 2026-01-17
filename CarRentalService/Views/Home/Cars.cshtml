@@ -1,0 +1,71 @@
+﻿@model CarRentalService.Models.CarsSearchVm
+@using CarRentalService.Models
+
+@{
+    ViewData["Title"] = "Cars";
+    var showVehicles = ViewBag.ShowVehicles as bool? ?? false;
+    var vehicles = ViewBag.Vehicles as List<Vehicle> ?? new List<Vehicle>();
+}
+
+<h1>Cars</h1>
+
+<form asp-action="Cars" method="post" style="margin-top:20px;">
+    <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
+        <div>
+            <label asp-for="Pickup"></label><br />
+            <input asp-for="Pickup" type="datetime-local" />
+            <span asp-validation-for="Pickup" style="color:red; display:block;"></span>
+        </div>
+
+        <div>
+            <label asp-for="Return"></label><br />
+            <input asp-for="Return" type="datetime-local" />
+            <span asp-validation-for="Return" style="color:red; display:block;"></span>
+        </div>
+
+        <button type="submit" class="btn">Search</button>
+    </div>
+
+    <span asp-validation-summary="ModelOnly" style="color:red; display:block; margin-top:10px;"></span>
+</form>
+
+@if (showVehicles)
+{
+    <hr style="margin:20px 0;" />
+    <h2>Available vehicles</h2>
+
+    @if (!vehicles.Any())
+    {
+        <p>No vehicles found in database.</p>
+    }
+    else
+    {
+        <div style="display:flex; flex-wrap:wrap; gap:16px;">
+            @foreach (var v in vehicles)
+            {
+                <div style="width:280px; border:2px solid black; padding:10px;">
+                    <img src="@v.ImageUrl" alt="@v.Brand @v.Model"
+                         style="width:100%; height:160px; object-fit:contain;" />
+                    <h3 style="margin:10px 0 4px;">@v.Brand @v.Model</h3>
+                    <div><b>@v.DailyPrice €</b> / day</div>
+                    <a href="#" class="btn" style="margin-top:10px;">RENT NOW</a>
+                </div>
+            }
+        </div>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        //  odmah spriječi Return 
+        const pickup = document.querySelector('input[name="Pickup"]');
+        const ret = document.querySelector('input[name="Return"]');
+
+        function syncMin() {
+            if (pickup && ret && pickup.value) ret.min = pickup.value;
+        }
+        pickup?.addEventListener('change', syncMin);
+        syncMin();
+    </script>
+}

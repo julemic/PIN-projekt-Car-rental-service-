@@ -23,7 +23,7 @@
                 
 
 
-                <!-- LEFT -->
+                <!-- Lijeva strana gumbi -->
                 <ul class="navbar-nav d-flex flex-row align-items-center gap-3 mb-0">
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Cars">Cars</a>
@@ -33,7 +33,7 @@
                     </li>
                 </ul>
 
-                <!-- RIGHT -->
+                <!-- Desna strana gumbi -->
                 <div class="d-flex align-items-center gap-3">
                     @if (User?.Identity != null && User.Identity.IsAuthenticated)
                     {

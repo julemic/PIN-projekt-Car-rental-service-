@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using CarRentalService.Models;
 
 namespace CarRentalService.Data
 {
@@ -9,5 +10,7 @@ namespace CarRentalService.Data
             : base(options)
         {
         }
+
+        public DbSet<Vehicle> Vehicles { get; set; }
     }
 }

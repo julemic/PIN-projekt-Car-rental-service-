@@ -1,17 +1,46 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CarRentalService.Data;
+using CarRentalService.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CarRentalService.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ApplicationDbContext _db;
+
+        public HomeController(ApplicationDbContext db)
         {
-            return View();
+            _db = db;
         }
 
-        public IActionResult Privacy()
+        public IActionResult Index() => View();
+
+        public IActionResult Privacy() => View();
+
+        //  Prikaz forme
+        [HttpGet]
+        public IActionResult Cars()
         {
-            return View();
+            return View(new CarsSearchVm());
+        }
+
+        //  Kad korisnik pošalje datume
+        [HttpPost]
+        public IActionResult Cars(CarsSearchVm vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                // ostani na formi i prikaži greške
+                return View(vm);
+            }
+
+            // datumi su OK ->  dohvatimo vozila
+            var vehicles = _db.Vehicles.ToList();
+
+            ViewBag.ShowVehicles = true;
+            ViewBag.Vehicles = vehicles;
+
+            return View(vm);
         }
     }
 }
