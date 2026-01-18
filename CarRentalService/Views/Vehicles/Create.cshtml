@@ -1,0 +1,54 @@
+﻿@model CarRentalService.Models.Vehicle
+
+@{
+    ViewData["Title"] = "Add Vehicle";
+}
+
+<h1>Add Vehicle</h1>
+
+<form asp-action="Create" method="post" style="max-width:650px; margin-top:20px;">
+    @Html.AntiForgeryToken()
+
+    <div style="margin-bottom:12px;">
+        <label asp-for="Brand"></label><br />
+        <input asp-for="Brand" style="width:100%; padding:8px;" />
+        <span asp-validation-for="Brand" style="color:red;"></span>
+    </div>
+
+    <div style="margin-bottom:12px;">
+        <label asp-for="Model"></label><br />
+        <input asp-for="Model" style="width:100%; padding:8px;" />
+        <span asp-validation-for="Model" style="color:red;"></span>
+    </div>
+
+    <div style="margin-bottom:12px;">
+        <label asp-for="Category"></label><br />
+        <input asp-for="Category" placeholder="Mini, SUV, Sedan, Electric..." style="width:100%; padding:8px;" />
+        <span asp-validation-for="Category" style="color:red;"></span>
+    </div>
+
+    <div style="margin-bottom:12px;">
+        <label asp-for="DailyPrice"></label><br />
+        <input asp-for="DailyPrice" type="number" step="0.01" style="width:100%; padding:8px;" />
+        <span asp-validation-for="DailyPrice" style="color:red;"></span>
+    </div>
+
+    <div style="margin-bottom:12px;">
+        <label asp-for="ImageUrl"></label><br />
+        <input asp-for="ImageUrl" placeholder="/css/vw-golf-8.png" style="width:100%; padding:8px;" />
+        <span asp-validation-for="ImageUrl" style="color:red;"></span>
+    </div>
+
+    <div style="margin-bottom:12px;">
+        <label>
+            <input asp-for="IsAvailable" />
+            Available
+        </label>
+    </div>
+
+    <button type="submit" class="btn">Save</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

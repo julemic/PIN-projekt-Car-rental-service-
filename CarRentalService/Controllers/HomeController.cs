@@ -17,30 +17,67 @@ namespace CarRentalService.Controllers
 
         public IActionResult Privacy() => View();
 
-        //  Prikaz forme
         [HttpGet]
         public IActionResult Cars()
         {
+            ViewBag.Categories = _db.Vehicles
+                .Select(v => v.Category)
+                .Where(c => c != null && c != "")
+                .Distinct()
+                .OrderBy(c => c)
+                .ToList();
+
+            ViewBag.SelectedCategory = "All offers";
+
             return View(new CarsSearchVm());
         }
 
-        //  Kad korisnik pošalje datume
         [HttpPost]
-        public IActionResult Cars(CarsSearchVm vm)
+        public IActionResult Cars(CarsSearchVm vm, string category = "All offers", string Sort = "")
+
         {
+            // uvijek napuni kategorije da se tipke prikazuju
+            ViewBag.Categories = _db.Vehicles
+            .Select(v => v.Category)
+            .Where(c => c != null && c != "")
+            .Distinct()
+            .OrderBy(c => c)
+            .ToList();
+
+            ViewBag.SelectedCategory = category;
+
             if (!ModelState.IsValid)
             {
-                // ostani na formi i prikaži greške
                 return View(vm);
             }
 
-            // datumi su OK ->  dohvatimo vozila
-            var vehicles = _db.Vehicles.ToList();
+            var query = _db.Vehicles.AsQueryable();
+
+            if (category != "All offers")
+            {
+                query = query.Where(v => v.Category == category);
+            }
+
+            // SORTIRANJE
+            switch (Sort)
+            {
+                case "price_asc":
+                    query = query.OrderBy(v => v.DailyPrice);
+                    break;
+
+                case "price_desc":
+                    query = query.OrderByDescending(v => v.DailyPrice);
+                    break;
+            }
 
             ViewBag.ShowVehicles = true;
-            ViewBag.Vehicles = vehicles;
+            ViewBag.Vehicles = query.ToList();
+            ViewBag.Sort = Sort;
+
 
             return View(vm);
         }
+
     }
 }
+

@@ -37,7 +37,12 @@
                 <div class="d-flex align-items-center gap-3">
                     @if (User?.Identity != null && User.Identity.IsAuthenticated)
                     {
-                        <span class="fw-bold text-uppercase">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a class="nav-link text-dark" asp-controller="Vehicles" asp-action="Create">Add Vehicle</a>
+                        }
+
+                        <span class="fw-bold text-uppercase mb-0">
                             Hi! @User.Identity.Name!
                         </span>
 
@@ -54,11 +59,11 @@
                     }
                     else
                     {
-                        <a class="nav-link text-dark me-3" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
                         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
                     }
-
                 </div>
+
 
             </div>
 

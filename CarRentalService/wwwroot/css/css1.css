@@ -380,3 +380,8 @@ header.shadow {
     display: block;
     clear: both;
 }
+
+.cars-page {
+    margin-bottom: 120px; /* za razmak od sivog footera */
+}
+

@@ -12,6 +12,9 @@ namespace CarRentalService.Models
         [Display(Name = "Return date & time")]
         public DateTime? Return { get; set; }
 
+        public string Category { get; set; } = "All offers";
+
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (Pickup.HasValue && Return.HasValue && Return.Value < Pickup.Value)
