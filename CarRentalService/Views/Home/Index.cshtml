@@ -9,7 +9,7 @@
             We have every car you need for your next trip — choose a car, book fast, and drive with confidence.
         </p>
 
-        <a href="#" class="btn">Discover now...</a>
+        <a asp-controller="Home" asp-action="Cars" class="btn">Discover now...</a>
     </div>
 </section>
 
@@ -20,61 +20,27 @@
         </h2>
 
         <img src="~/css/cars.jpg" alt="Cars" />
-        <p>
-            Pick your favorite brand and drive with style.
-        </p>
+        <p>Pick your favorite brand and drive with style.</p>
     </div>
 
     <div class="cars-container container">
         <div class="box">
-            <a href="https://www.audi.hr">
-                <img src="~/css/audi.png" style="width:100%" alt="Audi" />
+            <a href="https://www.audi.hr" target="_blank" rel="noopener">
+                <img src="~/css/audi.png" alt="Audi" />
             </a>
         </div>
 
-        <div class="box">
-            <img src="~/css/bmw.jpg" style="width:100%" alt="BMW" />
-        </div>
-
-        <div class="box">
-            <img src="~/css/citroen.png" style="width:100%" alt="Citroen" />
-        </div>
-
-        <div class="box">
-            <img src="~/css/ford.png" style="width:100%" alt="Ford" />
-        </div>
-
-        <div class="box">
-            <img src="~/css/Kia.png" style="width:100%" alt="Kia" />
-        </div>
-
-        <div class="box">
-            <img src="~/css/lambor.png" style="width:100%" alt="Lamborghini" />
-        </div>
-
-        <div class="box">
-            <img src="~/css/McLaren.png" style="width:100%" alt="McLaren" />
-        </div>
-
-        <div class="box">
-            <img src="~/css/mercedes.png" style="width:100%" alt="Mercedes" />
-        </div>
-
-        <div class="box">
-            <img src="~/css/nissan.jpg" style="width:100%" alt="Nissan" />
-        </div>
-
-        <div class="box">
-            <img src="~/css/peugeot.png" style="width:100%" alt="Peugeot" />
-        </div>
-
-        <div class="box">
-            <img src="~/css/porsche.jpg" style="width:100%" alt="Porsche" />
-        </div>
-
-        <div class="box">
-            <img src="~/css/renault.png" style="width:100%" alt="Renault" />
-        </div>
+        <div class="box"><img src="~/css/bmw.jpg" alt="BMW" /></div>
+        <div class="box"><img src="~/css/citroen.png" alt="Citroen" /></div>
+        <div class="box"><img src="~/css/ford.png" alt="Ford" /></div>
+        <div class="box"><img src="~/css/Kia.png" alt="Kia" /></div>
+        <div class="box"><img src="~/css/lambor.png" alt="Lamborghini" /></div>
+        <div class="box"><img src="~/css/McLaren.png" alt="McLaren" /></div>
+        <div class="box"><img src="~/css/mercedes.png" alt="Mercedes" /></div>
+        <div class="box"><img src="~/css/nissan.jpg" alt="Nissan" /></div>
+        <div class="box"><img src="~/css/peugeot.png" alt="Peugeot" /></div>
+        <div class="box"><img src="~/css/porsche.jpg" alt="Porsche" /></div>
+        <div class="box"><img src="~/css/renault.png" alt="Renault" /></div>
     </div>
 </section>
 
@@ -85,16 +51,15 @@
         <p>
             Car Rental Service brings you flexible rental options, transparent pricing and well-maintained vehicles.
         </p>
-        <a href="#" class="btn">Learn more...</a>
+
+        <a asp-controller="Home" asp-action="Cars" class="btn">Learn more...</a>
     </div>
 </section>
 
 <section class="parts" id="parts">
     <div class="heading">
         <h2>Our cars are always excellent</h2>
-        <p>
-            Here are some of our best deals going on right now.
-        </p>
+        <p>Here are some of our best deals going on right now.</p>
     </div>
 
     <div class="parts-container container">
@@ -102,42 +67,42 @@
             <img src="~/css/citroen_c3.png" style="width:80%" alt="Citroen C3" />
             <h3>Citroen C3</h3>
             <span>14,25€/Day</span>
-            <a href="#" class="btn">RENT NOW</a>
+            <a asp-controller="Home" asp-action="Cars" class="btn">RENT NOW</a>
         </div>
 
         <div class="box">
             <img src="~/css/audi_a5.png" style="width:80%" alt="Audi A5" />
             <h3>Audi A5</h3>
             <span>52,25€/Day</span>
-            <a href="#" class="btn">RENT NOW</a>
+            <a asp-controller="Home" asp-action="Cars" class="btn">RENT NOW</a>
         </div>
 
         <div class="box">
             <img src="~/css/peugeot_208.png" style="width:80%" alt="Peugeot 208" />
             <h3>Peugeot 208</h3>
             <span>28,55€/Day</span>
-            <a href="#" class="btn">RENT NOW</a>
+            <a asp-controller="Home" asp-action="Cars" class="btn">RENT NOW</a>
         </div>
 
         <div class="box">
             <img src="~/css/renault-clio-2024.png" style="width:80%" alt="Renault Clio" />
             <h3>Renault Clio</h3>
             <span>26,25€/Day</span>
-            <a href="#" class="btn">RENT NOW</a>
+            <a asp-controller="Home" asp-action="Cars" class="btn">RENT NOW</a>
         </div>
 
         <div class="box">
             <img src="~/css/renault-grand-coupe.png" style="width:80%" alt="Renault Grand Coupe" />
             <h3>Renault Grand Coupe</h3>
             <span>52,25€/Day</span>
-            <a href="#" class="btn">RENT NOW</a>
+            <a asp-controller="Home" asp-action="Cars" class="btn">RENT NOW</a>
         </div>
 
         <div class="box">
             <img src="~/css/vw-golf-8.png" style="width:80%" alt="VW Golf 8" />
             <h3>VW Golf 8</h3>
             <span>30€/Day</span>
-            <a href="#" class="btn">RENT NOW</a>
+            <a asp-controller="Home" asp-action="Cars" class="btn">RENT NOW</a>
         </div>
     </div>
 </section>
@@ -145,43 +110,32 @@
 <section class="blog" id="blog">
     <div class="heading">
         <h2>Blog content</h2>
-        <p>
-            Updates, tips and rental guides.
-        </p>
+        <p>Updates, tips and rental guides.</p>
     </div>
 
     <div class="blog-container container">
         <div class="box">
-            <img src="~/css/laferari.jpg" style="width:100%" alt="New upcoming cars" />
+            <img src="~/css/laferari.jpg" alt="New upcoming cars" />
             <h3>New upcoming cars</h3>
             <span>Jan 1 2026</span>
-            <p>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-            </p>
+            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
             <a href="#" class="blog-btn">Read more...<i class='bx bx-right-arrow-alt'></i></a>
         </div>
 
         <div class="box">
-            <img src="~/css/gtr.jpg" style="width:100%" alt="Best car for your price" />
+            <img src="~/css/gtr.jpg" alt="Best car for your price" />
             <h3>Best car for your price</h3>
             <span>Jan 1 2026</span>
-            <p>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-            </p>
+            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
             <a href="#" class="blog-btn">Read more...<i class='bx bx-right-arrow-alt'></i></a>
         </div>
 
         <div class="box">
-            <img src="~/css/aventador.jpg" style="width:100%" alt="How to find your perfect car" />
+            <img src="~/css/aventador.jpg" alt="How to find your perfect car" />
             <h3>How to find your perfect car</h3>
             <span>Jan 1 2026</span>
-            <p>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-            </p>
+            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
             <a href="#" class="blog-btn">Read more...<i class='bx bx-right-arrow-alt'></i></a>
         </div>
     </div>
 </section>
-
-
-<div style="clear: both;"></div>

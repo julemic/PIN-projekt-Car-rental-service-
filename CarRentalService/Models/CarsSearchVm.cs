@@ -12,6 +12,8 @@ namespace CarRentalService.Models
         [Display(Name = "Return date & time")]
         public DateTime? Return { get; set; }
 
+        public int? VehicleId { get; set; }
+
         public string Category { get; set; } = "All offers";
 
 

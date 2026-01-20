@@ -9,6 +9,7 @@
 
     var categories = ViewBag.Categories as List<string> ?? new List<string> { "All offers" };
     var selectedCategory = ViewBag.SelectedCategory as string ?? "All offers";
+    var availableMap = ViewBag.AvailableMap as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
 
 <div class="cars-page" style="padding-bottom:160px;">
@@ -16,6 +17,7 @@
     <h1>Cars</h1>
 
     <form asp-action="Cars" method="post" style="margin-top:20px;">
+        @Html.AntiForgeryToken()
 
         <!-- Datumi -->
         <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
@@ -36,6 +38,13 @@
 
         <span asp-validation-summary="ModelOnly"
               style="color:red; display:block; margin-top:10px;"></span>
+
+        @if (TempData["Msg"] != null)
+        {
+            <p style="margin-top:10px; color:green; font-weight:600;">
+                @TempData["Msg"]
+            </p>
+        }
 
         @if (showVehicles)
         {
@@ -66,12 +75,8 @@
                             onchange="this.form.submit()"
                             style="padding:10px 14px; border:1px solid #cbb3ff; border-radius:10px;">
                         <option value="">Sort by:</option>
-                        <option value="price_asc" selected="@(ViewBag.Sort == "price_asc")">
-                            Price (lowest)
-                        </option>
-                        <option value="price_desc" selected="@(ViewBag.Sort == "price_desc")">
-                            Price (highest)
-                        </option>
+                        <option value="price_asc" selected="@(ViewBag.Sort == "price_asc")">Price (lowest)</option>
+                        <option value="price_desc" selected="@(ViewBag.Sort == "price_desc")">Price (highest)</option>
                     </select>
                 </div>
 
@@ -87,28 +92,45 @@
                 <div style="display:flex; flex-wrap:wrap; gap:16px;">
                     @foreach (var v in vehicles)
                     {
-                        <div style="width:280px; border:2px solid black; padding:10px;">
+                        var available = availableMap.TryGetValue(v.Id, out var a) ? a : v.TotalQuantity;
+
+                        <div style="width:280px; border:2px solid black; padding:10px; opacity:@(available <= 0 ? "0.5" : "1")">
                             <img src="@v.ImageUrl"
                                  alt="@v.Brand @v.Model"
                                  style="width:100%; height:160px; object-fit:contain;" />
 
-                            <h3 style="margin:10px 0 4px;">
-                                @v.Brand @v.Model
-                            </h3>
+                            <h3 style="margin:10px 0 4px;">@v.Brand @v.Model</h3>
 
                             <div><b>@v.DailyPrice €</b> / day</div>
 
-                            <a href="#" class="btn" style="margin-top:10px;">
-                                RENT NOW
-                            </a>
+                            <div style="margin-top:6px; font-size:14px;">
+                                Available: <b>@available</b>
+                            </div>
+
+                            @if (available > 0)
+                            {
+                                <!-- RENT NOW -> ide na Home/Rent, šalje VehicleId + iste datume -->
+                                <button type="submit"
+                                        name="VehicleId"
+                                        value="@v.Id"
+                                        formaction="@Url.Action("Rent", "Home")"
+                                        class="btn"
+                                        style="margin-top:10px;">
+                                    RENT NOW
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn" style="margin-top:10px;" disabled>
+                                    NOT AVAILABLE
+                                </button>
+                            }
                         </div>
                     }
                 </div>
             }
         }
-
     </form>
-
 </div>
 
 @section Scripts {

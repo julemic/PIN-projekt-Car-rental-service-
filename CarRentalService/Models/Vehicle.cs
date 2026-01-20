@@ -14,10 +14,20 @@ namespace CarRentalService.Models
 
         public string Category { get; set; } = "";
 
+        [Range(0, 100000, ErrorMessage = "Price must be 0 or higher.")]
         public decimal DailyPrice { get; set; }
 
         public string? ImageUrl { get; set; }
 
         public bool IsAvailable { get; set; } = true;
+
+        public bool IsActive { get; set; } = true;
+       
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+
+
+        [Range(0, 1000, ErrorMessage = "Quantity cannot be negative.")]
+        public int TotalQuantity { get; set; }
     }
 }

@@ -1,12 +1,13 @@
 ﻿@model CarRentalService.Models.Vehicle
 @{
-    ViewData["Title"] = "Add Vehicle";
+    ViewData["Title"] = "Edit Vehicle";
 }
 
-<h1>Add Vehicle</h1>
+<h1>Edit Vehicle</h1>
 
 <form method="post">
     @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
 
     <div class="mb-2">
         <label>Brand</label>
@@ -39,7 +40,7 @@
     </div>
 
     <div class="mb-2">
-        <label>ImageUrl (example: /css/skoda-octavia.png)</label>
+        <label>ImageUrl</label>
         <input class="form-control" asp-for="ImageUrl" />
     </div>
 
@@ -48,7 +49,7 @@
         <label class="form-check-label">Active (show on site)</label>
     </div>
 
-    <button class="btn">Save</button>
+    <button class="btn">Update</button>
     <a class="btn btn-secondary" asp-action="Index">Back</a>
 </form>
 
