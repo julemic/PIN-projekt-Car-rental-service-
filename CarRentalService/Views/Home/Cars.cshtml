@@ -19,18 +19,18 @@
     <form asp-action="Cars" method="post" style="margin-top:20px;">
         @Html.AntiForgeryToken()
 
-        <!-- Datumi -->
+        <!-- DATUMI -->
         <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
             <div>
                 <label asp-for="Pickup"></label><br />
                 <input asp-for="Pickup" type="datetime-local" />
-                <span asp-validation-for="Pickup" style="color:red; display:block;"></span>
+                <span asp-validation-for="Pickup" style="color:red;"></span>
             </div>
 
             <div>
                 <label asp-for="Return"></label><br />
                 <input asp-for="Return" type="datetime-local" />
-                <span asp-validation-for="Return" style="color:red; display:block;"></span>
+                <span asp-validation-for="Return" style="color:red;"></span>
             </div>
 
             <button type="submit" class="btn">Search</button>
@@ -50,66 +50,102 @@
         {
             <hr style="margin:24px 0;" />
 
-            <!-- Filter i sort -->
+            <!-- INSURANCE -->
+            <div style="border:1px solid #eee; padding:18px; border-radius:12px; margin-bottom:24px;">
+                <div style="font-weight:800; font-size:22px; margin-bottom:10px;">
+                    Choose insurance
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:14px;">
+
+                    <label style="display:flex; gap:12px; padding:12px; border-top:1px solid #eee;">
+                        <input asp-for="SelectedInsurancePlan" type="radio" value="Basic" />
+                        <div style="flex:1;">
+                            <b>BASIC protect</b><br />
+                            Basic coverage – no extra cost.
+                        </div>
+                        <b>0 € / day</b>
+                    </label>
+
+                    <label style="display:flex; gap:12px; padding:12px; border-top:1px solid #eee;">
+                        <input asp-for="SelectedInsurancePlan" type="radio" value="Medium" />
+                        <div style="flex:1;">
+                            <b>MEDIUM protect</b><br />
+                            Reduced liability & passenger coverage.
+                        </div>
+                        <b>17 € / day</b>
+                    </label>
+
+                    <label style="display:flex; gap:12px; padding:12px; border-top:1px solid #eee; border-bottom:1px solid #eee;">
+                        <input asp-for="SelectedInsurancePlan" type="radio" value="Total" />
+                        <div style="flex:1;">
+                            <b>TOTAL protect</b><br />
+                            Maximum protection.
+                        </div>
+                        <b>22 € / day</b>
+                    </label>
+                </div>
+
+                <span asp-validation-for="SelectedInsurancePlan"
+                      style="color:red; display:block; margin-top:8px;"></span>
+            </div>
+
+            <!-- FILTER + SORT -->
             <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:24px;">
 
-                <button type="submit"
-                        name="Category"
-                        value="All offers"
-                        class="btn">
+                <button type="submit" name="Category" value="All offers" class="btn">
                     All offers
                 </button>
 
                 @foreach (var c in categories.Where(x => x != "All offers"))
                 {
-                    <button type="submit"
-                            name="Category"
-                            value="@c"
-                            class="btn">
+                    <button type="submit" name="Category" value="@c" class="btn">
                         @c
                     </button>
                 }
 
                 <div style="margin-left:auto;">
-                    <select name="Sort"
-                            onchange="this.form.submit()"
-                            style="padding:10px 14px; border:1px solid #cbb3ff; border-radius:10px;">
-                        <option value="">Sort by:</option>
-                        <option value="price_asc" selected="@(ViewBag.Sort == "price_asc")">Price (lowest)</option>
-                        <option value="price_desc" selected="@(ViewBag.Sort == "price_desc")">Price (highest)</option>
+                    <select name="Sort" onchange="this.form.submit()"
+                            style="padding:10px 14px; border-radius:10px;">
+                        <option value="">Sort by</option>
+                        <option value="price_asc" selected="@(ViewBag.Sort == "price_asc")">
+                            Price (lowest)
+                        </option>
+                        <option value="price_desc" selected="@(ViewBag.Sort == "price_desc")">
+                            Price (highest)
+                        </option>
                     </select>
                 </div>
-
             </div>
 
-            <!-- Auti -->
+            <!-- VEHICLES -->
             @if (!vehicles.Any())
             {
-                <p>No vehicles found in database.</p>
+                <p>No vehicles found.</p>
             }
             else
             {
                 <div style="display:flex; flex-wrap:wrap; gap:16px;">
                     @foreach (var v in vehicles)
                     {
-                        var available = availableMap.TryGetValue(v.Id, out var a) ? a : v.TotalQuantity;
+                        var available = availableMap.TryGetValue(v.Id, out var a)
+                        ? a
+                        : v.TotalQuantity;
 
-                        <div style="width:280px; border:2px solid black; padding:10px; opacity:@(available <= 0 ? "0.5" : "1")">
+                        <div style="width:280px; border:2px solid black; padding:12px;
+                                                opacity:@(available <= 0 ? "0.5" : "1")">
+
                             <img src="@v.ImageUrl"
                                  alt="@v.Brand @v.Model"
                                  style="width:100%; height:160px; object-fit:contain;" />
 
-                            <h3 style="margin:10px 0 4px;">@v.Brand @v.Model</h3>
+                            <h3>@v.Brand @v.Model</h3>
 
                             <div><b>@v.DailyPrice €</b> / day</div>
-
-                            <div style="margin-top:6px; font-size:14px;">
-                                Available: <b>@available</b>
-                            </div>
+                            <div>Available: <b>@available</b></div>
 
                             @if (available > 0)
                             {
-                                <!-- RENT NOW -> ide na Home/Rent, šalje VehicleId + iste datume -->
                                 <button type="submit"
                                         name="VehicleId"
                                         value="@v.Id"
@@ -121,7 +157,7 @@
                             }
                             else
                             {
-                                <button type="button" class="btn" style="margin-top:10px;" disabled>
+                                <button type="button" class="btn" disabled style="margin-top:10px;">
                                     NOT AVAILABLE
                                 </button>
                             }

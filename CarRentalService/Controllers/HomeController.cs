@@ -26,38 +26,24 @@ namespace CarRentalService.Controllers
         [HttpGet]
         public IActionResult Cars()
         {
-            ViewBag.Categories = _db.Vehicles
-                .Select(v => v.Category)
-                .Where(c => c != null && c != "")
-                .Distinct()
-                .OrderBy(c => c)
-                .ToList();
+            FillCarsViewBags(category: "All offers", sort: "");
 
-            ViewBag.SelectedCategory = "All offers";
-            ViewBag.Sort = "";
-
-            return View(new CarsSearchVm());
+            return View(new CarsSearchVm
+            {
+                SelectedInsurancePlan = InsurancePlan.Basic
+            });
         }
 
         
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Cars(CarsSearchVm vm, string Category = "All offers", string Sort = "")
         {
-            // uvijek napuni kategorije da tipke postoje
-            ViewBag.Categories = _db.Vehicles
-                .Select(v => v.Category)
-                .Where(c => c != null && c != "")
-                .Distinct()
-                .OrderBy(c => c)
-                .ToList();
-
-            ViewBag.SelectedCategory = Category;
-            ViewBag.Sort = Sort;
+            FillCarsViewBags(Category, Sort);
 
             if (!ModelState.IsValid)
                 return View(vm);
 
-            // validacija datuma (Return mora biti nakon Pickup)
             if (vm.Pickup == null || vm.Return == null || vm.Return <= vm.Pickup)
             {
                 ModelState.AddModelError("", "Return time must be after pickup time.");
@@ -67,25 +53,24 @@ namespace CarRentalService.Controllers
             var pickup = vm.Pickup.Value;
             var ret = vm.Return.Value;
 
-            // osnovni upit za vozila
+            
             var query = _db.Vehicles.Where(v => v.IsActive);
 
-
-            // filter kategorije
+            
             if (!string.IsNullOrWhiteSpace(Category) && Category != "All offers")
                 query = query.Where(v => v.Category == Category);
 
-            // sortiranje
+            
             query = Sort switch
             {
                 "price_asc" => query.OrderBy(v => v.DailyPrice),
                 "price_desc" => query.OrderByDescending(v => v.DailyPrice),
-                _ => query
+                _ => query.OrderBy(v => v.Id)
             };
 
             var vehicles = query.ToList();
 
-            // izračun dostupnosti za ODABRANI termin (TotalQuantity - overlapping rentals)
+            
             var overlapping = _db.Rentals
                 .Where(r => !r.IsReturned
                             && r.Pickup < ret
@@ -94,6 +79,7 @@ namespace CarRentalService.Controllers
                 .Select(g => new { VehicleId = g.Key, Count = g.Count() })
                 .ToDictionary(x => x.VehicleId, x => x.Count);
 
+            
             var availableMap = new Dictionary<int, int>();
             foreach (var v in vehicles)
             {
@@ -103,21 +89,21 @@ namespace CarRentalService.Controllers
                 availableMap[v.Id] = available;
             }
 
-            ViewBag.AvailableMap = availableMap;
             ViewBag.ShowVehicles = true;
             ViewBag.Vehicles = vehicles;
+            ViewBag.AvailableMap = availableMap;
 
             return View(vm);
         }
 
-        //  RENT NOW 
+        
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Rent(CarsSearchVm vm, string Category = "All offers", string Sort = "")
         {
             if (vm.VehicleId == null || vm.Pickup == null || vm.Return == null || vm.Return <= vm.Pickup)
-                return RedirectToAction("Cars");
+                return RedirectToAction(nameof(Cars));
 
             var pickup = vm.Pickup.Value;
             var ret = vm.Return.Value;
@@ -126,10 +112,10 @@ namespace CarRentalService.Controllers
             var userId = _userManager.GetUserId(User);
             if (userId == null) return Challenge();
 
-            var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == vehicleId);
+            var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == vehicleId && v.IsActive);
             if (vehicle == null) return NotFound();
 
-            // provjeri koliko je već zauzeto u tom terminu
+            
             var usedCount = await _db.Rentals.CountAsync(r =>
                 !r.IsReturned &&
                 r.VehicleId == vehicleId &&
@@ -140,26 +126,37 @@ namespace CarRentalService.Controllers
             if (available <= 0)
             {
                 TempData["Msg"] = "This vehicle is not available for the selected time.";
-                return RedirectToAction("Cars");
+                return RedirectToAction(nameof(Cars));
             }
 
-            // kreiraj rental
+            
+            decimal insurancePerDay = vm.SelectedInsurancePlan switch
+            {
+                InsurancePlan.Basic => 0m,
+                InsurancePlan.Medium => 17m,
+                InsurancePlan.Total => 22m,
+                _ => 0m
+            };
+
             _db.Rentals.Add(new Rental
             {
                 VehicleId = vehicleId,
                 Pickup = pickup,
                 Return = ret,
                 UserId = userId,
-                IsReturned = false
+                IsReturned = false,
+
+                InsurancePlan = vm.SelectedInsurancePlan,
+                
             });
 
             await _db.SaveChangesAsync();
 
             TempData["Msg"] = "Vehicle rented successfully!";
-            return RedirectToAction("MyRentals");
+            return RedirectToAction(nameof(MyRentals));
         }
 
-        //  rentals korisnika
+       
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> MyRentals()
@@ -176,7 +173,7 @@ namespace CarRentalService.Controllers
             return View(rentals);
         }
 
-        //  vrati auto
+        
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -194,7 +191,23 @@ namespace CarRentalService.Controllers
             await _db.SaveChangesAsync();
 
             TempData["Msg"] = "Vehicle returned.";
-            return RedirectToAction("MyRentals");
+            return RedirectToAction(nameof(MyRentals));
+        }
+
+        
+        private void FillCarsViewBags(string category, string sort)
+        {
+            var categories = _db.Vehicles
+                .Where(v => v.IsActive)
+                .Select(v => v.Category)
+                .Where(c => c != null && c != "")
+                .Distinct()
+                .OrderBy(c => c)
+                .ToList();
+
+            ViewBag.Categories = categories;
+            ViewBag.SelectedCategory = string.IsNullOrWhiteSpace(category) ? "All offers" : category;
+            ViewBag.Sort = sort ?? "";
         }
     }
 }

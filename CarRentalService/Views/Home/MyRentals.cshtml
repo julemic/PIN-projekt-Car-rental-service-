@@ -1,4 +1,5 @@
 ﻿@model List<CarRentalService.Models.Rental>
+@using CarRentalService.Models
 
 @{
     ViewData["Title"] = "My Rentals";
@@ -22,7 +23,18 @@ else
     <div style="display:flex; flex-wrap:wrap; gap:20px; margin-top:20px;">
         @foreach (var r in Model)
         {
-            <div style="width:320px; border:2px solid black; padding:14px;">
+            var carPerDay = r.Vehicle?.DailyPrice ?? 0m;
+
+            // broj dana (zaokruži na gore, minimum 1)
+            var totalDaysRaw = (r.Return - r.Pickup).TotalDays;
+            var days = (int)Math.Ceiling(totalDaysRaw);
+            if (days < 1) days = 1;
+
+            var insurancePerDay = Rental.GetInsurancePricePerDay(r.InsurancePlan);
+            var totalPerDay = carPerDay + insurancePerDay;
+            var totalPrice = totalPerDay * days;
+
+            <div style="width:340px; border:2px solid black; padding:14px;">
 
                 <h3 style="margin-bottom:6px;">
                     @r.Vehicle?.Brand @r.Vehicle?.Model
@@ -34,6 +46,28 @@ else
 
                 <div style="font-size:14px; margin-bottom:10px;">
                     <b>Return:</b> @r.Return.ToString("dd.MM.yyyy HH:mm")
+                </div>
+
+                <hr style="margin:10px 0;" />
+
+                <div style="font-size:14px; margin-bottom:4px;">
+                    <b>Car per day:</b> @carPerDay.ToString("0.00") €
+                </div>
+
+                <div style="font-size:14px; margin-bottom:4px;">
+                    <b>Insurance:</b> @r.InsurancePlan (@insurancePerDay.ToString("0.00") € / day)
+                </div>
+
+                <div style="font-size:14px; margin-bottom:4px;">
+                    <b>Total per day:</b> @totalPerDay.ToString("0.00") €
+                </div>
+
+                <div style="font-size:14px; margin-bottom:10px;">
+                    <b>Days:</b> @days
+                </div>
+
+                <div style="font-size:16px; font-weight:700; margin-bottom:14px;">
+                    Total price: @totalPrice.ToString("0.00") €
                 </div>
 
                 <form method="post" asp-action="ReturnCar">

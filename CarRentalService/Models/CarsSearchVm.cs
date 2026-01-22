@@ -16,13 +16,15 @@ namespace CarRentalService.Models
 
         public string Category { get; set; } = "All offers";
 
+        [Required(ErrorMessage = "Please choose insurance.")]
+        public InsurancePlan SelectedInsurancePlan { get; set; } = InsurancePlan.Basic;
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (Pickup.HasValue && Return.HasValue && Return.Value < Pickup.Value)
+            if (Pickup.HasValue && Return.HasValue && Return.Value <= Pickup.Value)
             {
                 yield return new ValidationResult(
-                    "Return date/time cannot be earlier than pickup date/time.",
+                    "Return date/time must be after pickup date/time.",
                     new[] { nameof(Return) }
                 );
             }
