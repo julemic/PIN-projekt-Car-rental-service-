@@ -34,9 +34,10 @@ namespace CarRentalService.Models
         public DateTime? ReturnedAt { get; set; }
 
         // Sprema se u bazu (enum kao int)
+        [Required]
         public InsurancePlan InsurancePlan { get; set; } = InsurancePlan.Basic;
 
-        
+        // Centralno mjesto za cijene osiguranja
         public static decimal GetInsurancePricePerDay(InsurancePlan plan)
         {
             return plan switch
@@ -48,7 +49,7 @@ namespace CarRentalService.Models
             };
         }
 
-        
+        // 🔹 IZRAČUNI (NE IDU U BAZU)
         [NotMapped]
         public int TotalDays
         {
@@ -60,16 +61,20 @@ namespace CarRentalService.Models
         }
 
         [NotMapped]
-        public decimal VehiclePricePerDay => Vehicle?.DailyPrice ?? 0m;
+        public decimal VehiclePricePerDay =>
+            Vehicle?.DailyPrice ?? 0m;
 
         [NotMapped]
-        public decimal InsurancePricePerDay => GetInsurancePricePerDay(InsurancePlan);
+        public decimal InsurancePricePerDay =>
+            GetInsurancePricePerDay(InsurancePlan);
 
         [NotMapped]
-        public decimal TotalPricePerDay => VehiclePricePerDay + InsurancePricePerDay;
+        public decimal TotalPricePerDay =>
+            VehiclePricePerDay + InsurancePricePerDay;
 
         [NotMapped]
-        public decimal TotalPrice => TotalDays * TotalPricePerDay;
+        public decimal TotalPrice =>
+            TotalDays * TotalPricePerDay;
 
         [NotMapped]
         public string InsuranceName => InsurancePlan switch

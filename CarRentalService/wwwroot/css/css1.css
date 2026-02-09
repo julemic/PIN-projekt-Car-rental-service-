@@ -418,3 +418,7 @@ header.shadow {
 .navbar .navbar-brand {
     white-space: nowrap !important;
 }
+
+.admin-page {
+    padding-bottom: 160px; 
+}

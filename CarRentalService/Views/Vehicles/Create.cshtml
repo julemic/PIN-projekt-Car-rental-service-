@@ -1,56 +1,63 @@
 ﻿@model CarRentalService.Models.Vehicle
+
 @{
     ViewData["Title"] = "Add Vehicle";
 }
 
-<h1>Add Vehicle</h1>
+<div class="admin-page">
 
-<form method="post">
-    @Html.AntiForgeryToken()
+    <h1>Add Vehicle</h1>
 
-    <div class="mb-2">
-        <label>Brand</label>
-        <input class="form-control" asp-for="Brand" />
-        <span asp-validation-for="Brand" class="text-danger"></span>
-    </div>
+    <form method="post">
+        @Html.AntiForgeryToken()
 
-    <div class="mb-2">
-        <label>Model</label>
-        <input class="form-control" asp-for="Model" />
-        <span asp-validation-for="Model" class="text-danger"></span>
-    </div>
+        <div class="mb-2">
+            <label>Brand</label>
+            <input class="form-control" asp-for="Brand" />
+            <span asp-validation-for="Brand" class="text-danger"></span>
+        </div>
 
-    <div class="mb-2">
-        <label>Category</label>
-        <input class="form-control" asp-for="Category" />
-        <span asp-validation-for="Category" class="text-danger"></span>
-    </div>
+        <div class="mb-2">
+            <label>Model</label>
+            <input class="form-control" asp-for="Model" />
+            <span asp-validation-for="Model" class="text-danger"></span>
+        </div>
 
-    <div class="mb-2">
-        <label>Daily Price (€)</label>
-        <input class="form-control" asp-for="DailyPrice" />
-        <span asp-validation-for="DailyPrice" class="text-danger"></span>
-    </div>
+        <div class="mb-2">
+            <label>Category</label>
+            <input class="form-control" asp-for="Category" />
+            <span asp-validation-for="Category" class="text-danger"></span>
+        </div>
 
-    <div class="mb-2">
-        <label>Total Quantity</label>
-        <input class="form-control" asp-for="TotalQuantity" />
-        <span asp-validation-for="TotalQuantity" class="text-danger"></span>
-    </div>
+        <div class="mb-2">
+            <label>Daily Price (€)</label>
+            <input class="form-control" asp-for="DailyPrice" />
+            <span asp-validation-for="DailyPrice" class="text-danger"></span>
+        </div>
 
-    <div class="mb-2">
-        <label>ImageUrl (example: /css/skoda-octavia.png)</label>
-        <input class="form-control" asp-for="ImageUrl" />
-    </div>
+        <div class="mb-2">
+            <label>Total Quantity</label>
+            <input class="form-control" asp-for="TotalQuantity" />
+            <span asp-validation-for="TotalQuantity" class="text-danger"></span>
+        </div>
 
-    <div class="form-check mb-3">
-        <input class="form-check-input" asp-for="IsActive" />
-        <label class="form-check-label">Active (show on site)</label>
-    </div>
+        <div class="mb-2">
+            <label>ImageUrl (example: /css/skoda-octavia.png)</label>
+            <input class="form-control" asp-for="ImageUrl" />
+        </div>
 
-    <button class="btn">Save</button>
-    <a class="btn btn-secondary" asp-action="Index">Back</a>
-</form>
+        <div class="form-check mb-3">
+            <input class="form-check-input" asp-for="IsActive" />
+            <label class="form-check-label">Active (show on site)</label>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <button type="submit" class="btn">Save</button>
+            <a class="btn btn-secondary" asp-action="Index">Back</a>
+        </div>
+    </form>
+
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

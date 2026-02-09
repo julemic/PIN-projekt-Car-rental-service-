@@ -1,6 +1,8 @@
 using CarRentalService.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure; QuestPDF.Settings.License = LicenseType.Community;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
