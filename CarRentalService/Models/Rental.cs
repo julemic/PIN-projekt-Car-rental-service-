@@ -4,6 +4,14 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CarRentalService.Models
 {
+    public enum RentalStatus
+    {
+        Reserved = 0,
+        Cancelled = 1,
+        Returned = 2,
+        Completed = 3
+    }
+
     public enum InsurancePlan
     {
         Basic = 0,
@@ -21,7 +29,10 @@ namespace CarRentalService.Models
 
         [Required]
         public string UserId { get; set; } = "";
-        public IdentityUser? User { get; set; }
+        public ApplicationUser? User { get; set; }
+
+        [Required]
+        public RentalStatus Status { get; set; } = RentalStatus.Reserved;
 
         [Required]
         public DateTime Pickup { get; set; }
@@ -29,15 +40,16 @@ namespace CarRentalService.Models
         [Required]
         public DateTime Return { get; set; }
 
-        public bool IsReturned { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ReturnedAt { get; set; }
 
-        // Sprema se u bazu (enum kao int)
         [Required]
         public InsurancePlan InsurancePlan { get; set; } = InsurancePlan.Basic;
 
-        // Centralno mjesto za cijene osiguranja
+        // ==============================
+        // CALCULATED PROPERTIES
+        // ==============================
+
         public static decimal GetInsurancePricePerDay(InsurancePlan plan)
         {
             return plan switch
@@ -49,7 +61,6 @@ namespace CarRentalService.Models
             };
         }
 
-        // 🔹 IZRAČUNI (NE IDU U BAZU)
         [NotMapped]
         public int TotalDays
         {
@@ -77,6 +88,19 @@ namespace CarRentalService.Models
             TotalDays * TotalPricePerDay;
 
         [NotMapped]
+        public decimal DepositAmount =>
+            Math.Round(TotalPrice * 0.20m, 2);
+
+        [NotMapped]
+        public DateTime FreeCancellationUntil =>
+            Pickup.AddHours(-48);
+
+        [NotMapped]
+        public bool CanFreeCancel =>
+            Status == RentalStatus.Reserved &&
+            DateTime.UtcNow <= FreeCancellationUntil;
+
+        [NotMapped]
         public string InsuranceName => InsurancePlan switch
         {
             InsurancePlan.Basic => "Basic protect",
@@ -84,5 +108,15 @@ namespace CarRentalService.Models
             InsurancePlan.Total => "Total protect",
             _ => "Basic protect"
         };
+
+        public decimal DepositPaid { get; set; }
+        public decimal FinalAmountPaid { get; set; }
+
+        public bool IsDepositPaid { get; set; }
+        public bool IsFullyPaid { get; set; }
+
+        public DateTime? DepositPaidAt { get; set; }
+        public DateTime? FullyPaidAt { get; set; }
+
     }
 }

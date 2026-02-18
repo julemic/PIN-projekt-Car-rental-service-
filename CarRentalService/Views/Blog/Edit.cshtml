@@ -1,0 +1,61 @@
+﻿@model CarRentalService.Models.BlogPost
+
+@{
+    ViewData["Title"] = "Edit Blog Post";
+}
+
+<div class="container mt-5 mb-5">
+
+    <h1 class="mb-4">Edit Blog Post</h1>
+
+    <form method="post" enctype="multipart/form-data">
+
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Short Description</label>
+            <input asp-for="ShortDescription" class="form-control" />
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <div class="mb-3">
+                <p><strong>Current Image:</strong></p>
+                <img src="@Model.ImagePath"
+                     class="img-fluid"
+                     style="max-height:250px; object-fit:cover;" />
+            </div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label">Upload New Image</label>
+            <input type="file" name="imageFile" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Content</label>
+            <textarea asp-for="Content" class="form-control"></textarea>
+            <span asp-validation-for="Content" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-dark">
+            Save Changes
+        </button>
+
+    </form>
+</div>
+
+@section Scripts {
+    
+
+    <script src="https://cdn.tiny.cloud/1/kyvn2np9rdj6bhm2024viqx7qu3t98wnufmpv7xavmsjwhv3/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+    <script src="~/js/blog-editor.js" asp-append-version="true"></script>
+
+}

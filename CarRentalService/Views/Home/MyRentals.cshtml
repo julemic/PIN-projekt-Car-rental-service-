@@ -1,70 +1,162 @@
-﻿@model List<CarRentalService.Models.Rental>
+﻿@model List<CarRentalService.Models.RentalViewModel>
+@using CarRentalService.Models
 
 @{
     ViewData["Title"] = "My Rentals";
 }
 
-<div class="myrentals-page" style="padding-bottom:140px;">
-    <h1>My Rentals</h1>
+<div class="container mt-4 mb-5">
+    <h1 class="mb-4 fw-bold">My Rentals</h1>
 
     @if (TempData["Msg"] != null)
     {
-        <p style="color:green; font-weight:600; margin-bottom:20px;">
+        <div class="alert alert-success shadow-sm">
             @TempData["Msg"]
-        </p>
+        </div>
     }
 
     @if (!Model.Any())
     {
-        <p>You currently have no active rentals.</p>
+        <div class="alert alert-info shadow-sm">
+            You currently have no active rentals.
+        </div>
     }
     else
     {
-        <div style="display:flex; flex-wrap:wrap; gap:20px; margin-top:20px;">
+        <div class="row g-4">
             @foreach (var r in Model)
             {
-                <div style="width:340px; border:2px solid black; padding:14px;">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card shadow-sm h-100 border-0">
 
-                    <h3 style="margin-bottom:6px;">
-                        @r.Vehicle?.Brand @r.Vehicle?.Model
-                    </h3>
+                        <div class="card-body">
 
-                    <div style="font-size:14px; margin-bottom:4px;">
-                        <b>Pickup:</b> @r.Pickup.ToString("dd.MM.yyyy HH:mm")
+                            <h5 class="card-title fw-bold mb-3">
+                                @r.Brand @r.Model
+                            </h5>
+
+                            <!-- STATUS BADGE -->
+                            <div class="mb-3">
+                                <span class="badge
+                                            @(r.Status == RentalStatus.Reserved ? "bg-primary" :
+                                                                            r.Status == RentalStatus.Returned ? "bg-success" :
+                                                                            r.Status == RentalStatus.Cancelled ? "bg-secondary" :
+                                                                            "bg-dark")">
+                            @r.Status
+                        </span>
                     </div>
 
-                    <div style="font-size:14px; margin-bottom:10px;">
-                        <b>Return:</b> @r.Return.ToString("dd.MM.yyyy HH:mm")
-                    </div>
+                            <p class="mb-1">
+                                <strong>Pickup:</strong>
+                                @r.Pickup.ToString("dd.MM.yyyy")
+                            </p>
 
-                    <div style="font-size:14px; margin-bottom:10px;">
-                        <b>Insurance:</b> @r.InsuranceName (@r.InsurancePricePerDay € / day)
-                    </div>
+                            <p class="mb-2">
+                                <strong>Return:</strong>
+                                @r.Return.ToString("dd.MM.yyyy")
+                            </p>
 
-                    <div style="font-size:14px; margin-bottom:12px;">
-                        <b>Total:</b> @r.TotalPrice € ( @r.TotalDays days × @r.TotalPricePerDay € )
-                    </div>
+                            <hr />
 
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <!-- RETURN CAR -->
-                        <form method="post" asp-action="ReturnCar" style="margin:0;">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="rentalId" value="@r.Id" />
-                            <button type="submit" class="btn">Return car</button>
-                        </form>
+                            <p class="mb-1">
+                                <strong>Insurance:</strong>
+                                @r.InsuranceName
+                                <span class="text-muted">
+                                    (@r.InsurancePricePerDay € / day)
+                                </span>
+                            </p>
 
-                        <!-- ACCIDENT REPORT (opens modal) -->
-                        <button type="button"
-                                class="btn"
-                                onclick="openAccident(
-                                    @r.Id,
-                                    @(r.Vehicle?.Id ?? 0),
-                                    '@(r.Vehicle?.Brand ?? "")',
-                                    '@(r.Vehicle?.Model ?? "")',
-                                    '@(r.Vehicle?.Category ?? "")'
-                                )">
-                            Accident report
-                        </button>
+                            <p class="mb-2">
+                                <strong>Total:</strong>
+                                <span class="fw-bold">
+                                    @r.TotalPrice €
+                                </span>
+                                <span class="text-muted">
+                                    (@r.TotalDays days × @r.TotalPricePerDay €)
+                                </span>
+                            </p>
+
+                            <!-- PAYMENT INFO -->
+                    @if (r.Status == RentalStatus.Reserved)
+                            {
+                                <p class="mb-1 text-warning">
+                                    <strong>Deposit paid:</strong>
+                                    @r.DepositAmount €
+                                </p>
+
+                                <p class="mb-2">
+                                    <strong>Free cancellation until:</strong><br />
+                                    @r.FreeCancellationUntil.ToString("dd.MM.yyyy")
+
+                                    @if (r.CanFreeCancel)
+                                    {
+                                        <span class="badge bg-success ms-2">
+                                            Refund available
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger ms-2">
+                                            Non-refundable
+                                        </span>
+                                    }
+                                </p>
+                            }
+                            else if (r.Status == RentalStatus.Returned)
+                            {
+                                <p class="mb-1 text-success">
+                                    <strong>Deposit paid:</strong>
+                                    @r.DepositAmount €
+                                </p>
+
+                                <p class="mb-1 text-success">
+                                    <strong>Fully paid:</strong> Yes
+                                </p>
+                            }
+                            else if (r.Status == RentalStatus.Cancelled)
+                            {
+                                <p class="mb-1 text-muted">
+                                    Reservation cancelled.
+                                </p>
+                            }
+
+                        </div>
+
+                        <!-- ACTION BUTTONS -->
+                        <div class="card-footer bg-white border-top-0 d-flex gap-2 flex-wrap">
+
+                            @if (r.Status == RentalStatus.Reserved)
+                            {
+                                <form method="post"
+                                      asp-action="CancelReservation"
+                                      class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden"
+                                           name="rentalId"
+                                           value="@r.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-outline-danger btn-sm">
+                                        Cancel reservation
+                                    </button>
+                                </form>
+
+                                <form method="post"
+                                      asp-action="ReturnCar"
+                                      class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden"
+                                           name="rentalId"
+                                           value="@r.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-success btn-sm">
+                                        Return car
+                                    </button>
+                                </form>
+                            }
+
+                        </div>
 
                     </div>
                 </div>
@@ -72,122 +164,3 @@
         </div>
     }
 </div>
-
-<!-- MODAL -->
-<div id="accidentModal"
-     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000;">
-    <div style="
-        max-width:640px;
-        background:white;
-        margin:60px auto;
-        padding:18px;
-        border-radius:10px;
-        max-height:80vh;
-        overflow-y:auto;
-">
-
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h2 style="margin:0;">Accident report</h2>
-            <button type="button" class="btn" onclick="closeAccident()">Close</button>
-        </div>
-
-        <form method="post" asp-action="AccidentReportPdf">
-            @Html.AntiForgeryToken()
-
-            <input type="hidden" name="RentalId" id="RentalId" value="0" />
-
-            <input type="hidden" name="VehicleId" id="VehicleId" />
-            <input type="hidden" name="VehicleBrand" id="VehicleBrand" />
-            <input type="hidden" name="VehicleModel" id="VehicleModel" />
-            <input type="hidden" name="VehicleCategory" id="VehicleCategory" />
-
-
-            <div style="border:1px solid #ddd; padding:12px; border-radius:8px; margin-bottom:16px;">
-                <div style="font-weight:700; margin-bottom:6px;">Vehicle information</div>
-
-                <div><b>ID:</b> <span id="vIdText"></span></div>
-                <div><b>Brand:</b> <span id="vBrandText"></span></div>
-                <div><b>Model:</b> <span id="vModelText"></span></div>
-                <div><b>Category:</b> <span id="vCategoryText"></span></div>
-            </div>
-
-
-            <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                <div style="flex:1;">
-                    <label>Full name</label>
-                    <input name="FullName" class="form-control" />
-                </div>
-                <div style="flex:1;">
-                    <label>Email</label>
-                    <input name="Email" class="form-control" type="email" />
-                </div>
-            </div>
-
-            <div style="margin-top:12px;">
-                <label>Phone (optional)</label>
-                <input name="Phone" class="form-control" />
-            </div>
-
-            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
-                <div style="flex:1;">
-                    <label>Accident date & time</label>
-                    <input name="AccidentDate" class="form-control" type="datetime-local" />
-                </div>
-                <div style="flex:1;">
-                    <label>Location</label>
-                    <input name="Location" class="form-control" />
-                </div>
-            </div>
-
-            <div style="margin-top:12px;">
-                <label style="display:flex; gap:8px; align-items:center;">
-                    <input type="checkbox" name="PoliceReported" value="true" />
-                    Police reported
-                </label>
-            </div>
-
-            <div style="margin-top:12px;">
-                <label>Other party (optional)</label>
-                <input name="OtherParty" class="form-control" />
-            </div>
-
-            <div style="margin-top:12px;">
-                <label>Description</label>
-                <textarea name="Description" class="form-control" rows="5"></textarea>
-            </div>
-
-            <div style="margin-top:16px;">
-                <button type="submit" class="btn">Save as PDF</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        function openAccident(rentalId, vehicleId, brand, model, category) {
-
-            // hidden inputi (za PDF / backend)
-            document.getElementById("RentalId").value = rentalId;
-            document.getElementById("VehicleId").value = vehicleId;
-            document.getElementById("VehicleBrand").value = brand;
-            document.getElementById("VehicleModel").value = model;
-            document.getElementById("VehicleCategory").value = category;
-
-            // to su vidljivi podaci
-            document.getElementById("vIdText").innerText = vehicleId || "-";
-            document.getElementById("vBrandText").innerText = brand || "-";
-            document.getElementById("vModelText").innerText = model || "-";
-            document.getElementById("vCategoryText").innerText = category || "-";
-
-            document.getElementById("accidentModal").style.display = "block";
-        }
-
-        function closeAccident() {
-            document.getElementById("accidentModal").style.display = "none";
-        }
-    </script>
-
-}
-

@@ -1,0 +1,22 @@
+﻿.admin-table {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+    .admin-table thead {
+        background: #212529;
+        color: white;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        vertical-align: middle;
+    }
+
+
+
+.admin-btn {
+    font-size: 14px;
+    padding: 6px 14px;
+}

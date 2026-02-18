@@ -6,107 +6,161 @@
 
     var showVehicles = ViewBag.ShowVehicles as bool? ?? false;
     var vehicles = ViewBag.Vehicles as List<Vehicle> ?? new List<Vehicle>();
-
     var categories = ViewBag.Categories as List<string> ?? new List<string> { "All offers" };
     var selectedCategory = ViewBag.SelectedCategory as string ?? "All offers";
     var availableMap = ViewBag.AvailableMap as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
 
-<div class="cars-page" style="padding-bottom:160px;">
+<div class="container mt-4 mb-5">
 
-    <h1>Cars</h1>
+    <h1 class="mb-4">Cars</h1>
 
-    <form asp-action="Cars" method="post" style="margin-top:20px;">
+    <form asp-action="Cars" asp-controller="Home" method="post">
         @Html.AntiForgeryToken()
 
-        <!-- DATUMI -->
-        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
-            <div>
-                <label asp-for="Pickup"></label><br />
-                <input asp-for="Pickup" type="datetime-local" />
-                <span asp-validation-for="Pickup" style="color:red;"></span>
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="row mb-4">
+
+            <div class="col-md-4">
+                <label asp-for="Pickup" class="form-label"></label>
+                <input asp-for="Pickup" type="date" class="form-control" />
+                <span asp-validation-for="Pickup" class="text-danger"></span>
             </div>
 
-            <div>
-                <label asp-for="Return"></label><br />
-                <input asp-for="Return" type="datetime-local" />
-                <span asp-validation-for="Return" style="color:red;"></span>
+            <div class="col-md-4">
+                <label asp-for="Return" class="form-label"></label>
+                <input asp-for="Return" type="date" class="form-control" />
+                <span asp-validation-for="Return" class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn">Search</button>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-danger w-100">
+                    Search
+                </button>
+            </div>
+
         </div>
-
-        <span asp-validation-summary="ModelOnly"
-              style="color:red; display:block; margin-top:10px;"></span>
 
         @if (TempData["Msg"] != null)
         {
-            <p style="margin-top:10px; color:green; font-weight:600;">
+            <div class="alert alert-success">
                 @TempData["Msg"]
-            </p>
+            </div>
         }
 
         @if (showVehicles)
         {
-            <hr style="margin:24px 0;" />
+            <hr />
 
             <!-- INSURANCE -->
-            <div style="border:1px solid #eee; padding:18px; border-radius:12px; margin-bottom:24px;">
-                <div style="font-weight:800; font-size:22px; margin-bottom:10px;">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header fw-bold">
                     Choose insurance
                 </div>
 
-                <div style="display:flex; flex-direction:column; gap:14px;">
+                <div class="card-body">
 
-                    <label style="display:flex; gap:12px; padding:12px; border-top:1px solid #eee;">
-                        <input asp-for="SelectedInsurancePlan" type="radio" value="Basic" />
-                        <div style="flex:1;">
-                            <b>BASIC protect</b><br />
-                            Basic coverage – no extra cost.
-                        </div>
-                        <b>0 € / day</b>
-                    </label>
+                    
+                    <div class="form-check mb-3 p-3 border rounded">
+                        <input class="form-check-input"
+                               asp-for="SelectedInsurancePlan"
+                               type="radio"
+                               value="Basic"
+                               id="basicPlan" />
 
-                    <label style="display:flex; gap:12px; padding:12px; border-top:1px solid #eee;">
-                        <input asp-for="SelectedInsurancePlan" type="radio" value="Medium" />
-                        <div style="flex:1;">
-                            <b>MEDIUM protect</b><br />
-                            Reduced liability & passenger coverage.
-                        </div>
-                        <b>17 € / day</b>
-                    </label>
+                        <label class="form-check-label w-100" for="basicPlan">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>BASIC protect</strong><br />
+                                    <small class="text-muted">
+                                        ✔ Basic liability coverage<br />
+                                        ✔ Mandatory insurance included<br />
+                                        ✖ No damage reduction
+                                    </small>
+                                </div>
+                                <div class="fw-bold">
+                                    0 € / day
+                                </div>
+                            </div>
+                        </label>
+                    </div>
 
-                    <label style="display:flex; gap:12px; padding:12px; border-top:1px solid #eee; border-bottom:1px solid #eee;">
-                        <input asp-for="SelectedInsurancePlan" type="radio" value="Total" />
-                        <div style="flex:1;">
-                            <b>TOTAL protect</b><br />
-                            Maximum protection.
-                        </div>
-                        <b>22 € / day</b>
-                    </label>
+                    
+                    <div class="form-check mb-3 p-3 border rounded">
+                        <input class="form-check-input"
+                               asp-for="SelectedInsurancePlan"
+                               type="radio"
+                               value="Medium"
+                               id="mediumPlan" />
+
+                        <label class="form-check-label w-100" for="mediumPlan">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>MEDIUM protect</strong><br />
+                                    <small class="text-muted">
+                                        ✔ Reduced damage liability<br />
+                                        ✔ Passenger insurance<br />
+                                        ✔ Partial theft protection
+                                    </small>
+                                </div>
+                                <div class="fw-bold">
+                                    17 € / day
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    
+                    <div class="form-check p-3 border rounded">
+                        <input class="form-check-input"
+                               asp-for="SelectedInsurancePlan"
+                               type="radio"
+                               value="Total"
+                               id="totalPlan" />
+
+                        <label class="form-check-label w-100" for="totalPlan">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>TOTAL protect</strong><br />
+                                    <small class="text-muted">
+                                        ✔ Full damage coverage<br />
+                                        ✔ Theft protection<br />
+                                        ✔ No excess / no hidden costs
+                                    </small>
+                                </div>
+                                <div class="fw-bold">
+                                    22 € / day
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <span asp-validation-for="SelectedInsurancePlan"
+                          class="text-danger d-block mt-2"></span>
+
                 </div>
-
-                <span asp-validation-for="SelectedInsurancePlan"
-                      style="color:red; display:block; margin-top:8px;"></span>
             </div>
 
+
             <!-- FILTER + SORT -->
-            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:24px;">
+            <div class="d-flex mb-4 align-items-center">
 
-                <button type="submit" name="Category" value="All offers" class="btn">
-                    All offers
-                </button>
-
-                @foreach (var c in categories.Where(x => x != "All offers"))
-                {
-                    <button type="submit" name="Category" value="@c" class="btn">
-                        @c
+                <div class="me-3">
+                    <button type="submit" name="Category" value="All offers" class="btn btn-outline-dark btn-sm">
+                        All offers
                     </button>
-                }
 
-                <div style="margin-left:auto;">
-                    <select name="Sort" onchange="this.form.submit()"
-                            style="padding:10px 14px; border-radius:10px;">
+                    @foreach (var c in categories.Where(x => x != "All offers"))
+                    {
+                        <button type="submit" name="Category" value="@c" class="btn btn-outline-dark btn-sm">
+                            @c
+                        </button>
+                    }
+                </div>
+
+                <div class="ms-auto">
+                    <select name="Sort" onchange="this.form.submit()" class="form-select form-select-sm">
                         <option value="">Sort by</option>
                         <option value="price_asc" selected="@(ViewBag.Sort == "price_asc")">
                             Price (lowest)
@@ -116,6 +170,7 @@
                         </option>
                     </select>
                 </div>
+
             </div>
 
             <!-- VEHICLES -->
@@ -125,47 +180,51 @@
             }
             else
             {
-                <div style="display:flex; flex-wrap:wrap; gap:16px;">
+                <div class="row">
                     @foreach (var v in vehicles)
                     {
                         var available = availableMap.TryGetValue(v.Id, out var a)
                         ? a
                         : v.TotalQuantity;
 
-                        <div style="width:280px; border:2px solid black; padding:12px;
-                                                opacity:@(available <= 0 ? "0.5" : "1")">
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 @(available <= 0 ? "opacity-50" : "")">
 
-                            <img src="@v.ImageUrl"
-                                 alt="@v.Brand @v.Model"
-                                 style="width:100%; height:160px; object-fit:contain;" />
+                                <img src="@v.ImageUrl"
+                                     class="card-img-top"
+                                     style="height:160px; object-fit:contain;" />
 
-                            <h3>@v.Brand @v.Model</h3>
+                                <div class="card-body">
+                                    <h5>@v.Brand @v.Model</h5>
+                                    <p><b>@v.DailyPrice €</b> / day</p>
+                                    <p>Available: <b>@available</b></p>
 
-                            <div><b>@v.DailyPrice €</b> / day</div>
-                            <div>Available: <b>@available</b></div>
-
-                            @if (available > 0)
-                            {
-                                <button type="submit"
-                                        name="VehicleId"
-                                        value="@v.Id"
-                                        formaction="@Url.Action("Rent", "Home")"
-                                        class="btn"
-                                        style="margin-top:10px;">
-                                    RENT NOW
-                                </button>
-                            }
-                            else
-                            {
-                                <button type="button" class="btn" disabled style="margin-top:10px;">
-                                    NOT AVAILABLE
-                                </button>
-                            }
+                                    @if (available > 0)
+                                    {
+                                        <button type="submit"
+                                                name="VehicleId"
+                                                value="@v.Id"
+                                                formaction="@Url.Action("Rent", "Home")"
+                                                class="btn btn-danger w-100">
+                                            RENT NOW
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button"
+                                                class="btn btn-secondary w-100"
+                                                disabled>
+                                            NOT AVAILABLE
+                                        </button>
+                                    }
+                                </div>
+                            </div>
                         </div>
                     }
                 </div>
             }
         }
+
     </form>
 </div>
 
@@ -176,7 +235,8 @@
         const ret = document.querySelector('input[name="Return"]');
 
         function syncMin() {
-            if (pickup && ret && pickup.value) ret.min = pickup.value;
+            if (pickup && ret && pickup.value)
+                ret.min = pickup.value;
         }
 
         pickup?.addEventListener('change', syncMin);

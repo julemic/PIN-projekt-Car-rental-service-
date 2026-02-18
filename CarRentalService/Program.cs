@@ -1,25 +1,45 @@
 using CarRentalService.Data;
+using CarRentalService.Models;
+using CarRentalService.Services;
+using CarRentalService.Services.Pdf;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure; QuestPDF.Settings.License = LicenseType.Community;
+
+
+
+
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<AccidentReportPdfGenerator>();
+
 
 builder.Services
-    .AddDefaultIdentity<IdentityUser>(options =>
+    .AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
-        options.Password.RequireNonAlphanumeric = false;
+
+        options.Password.RequiredLength = 7;
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+
+        options.User.RequireUniqueEmail = true;
     })
-    .AddRoles<IdentityRole>() 
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<IRentalPricingService, RentalPricingService>();
+
 
 var app = builder.Build();
 
@@ -42,39 +62,64 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
+    var config = services.GetRequiredService<IConfiguration>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
+    var adminEmail = config["AdminSettings:Email"];
+    var adminPassword = config["AdminSettings:Password"];
     const string adminRole = "Admin";
-    const string adminEmail = "aaa@gmail.com";
-    const string adminPassword = "Kremenko1";
 
-    // 1) Role
+    if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
+        throw new Exception("Admin credentials missing from secrets.json");
+
+    // Create role
     if (!await roleManager.RoleExistsAsync(adminRole))
     {
         await roleManager.CreateAsync(new IdentityRole(adminRole));
     }
 
-    // 2) User
+    // Create user
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
     if (adminUser == null)
     {
-        adminUser = new IdentityUser
+        adminUser = new ApplicationUser
         {
             UserName = adminEmail,
             Email = adminEmail,
-            EmailConfirmed = true
+            EmailConfirmed = true,
+
+            // Minimal required fields
+            FirstName = "Admin",
+            LastName = "User",
+            DateOfBirth = DateTime.UtcNow.AddYears(-30),
+            ResidenceAddress = "Admin Address",
+            City = "Admin City",
+            Nationality = "HR",
+            Oib = "12345678901",
+            DriverLicenseNumber = "12345678",
+            IdCardNumber = "ABC123456",
+            IsVerified = true,
+            VerifiedAt = DateTime.UtcNow
         };
 
-        await userManager.CreateAsync(adminUser, adminPassword);
+        var result = await userManager.CreateAsync(adminUser, adminPassword);
+
+        if (!result.Succeeded)
+        {
+            throw new Exception("Admin creation failed: " +
+                string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
     }
 
-    // 3) Add to role
     if (!await userManager.IsInRoleAsync(adminUser, adminRole))
     {
         await userManager.AddToRoleAsync(adminUser, adminRole);
     }
 }
+
+
 
 app.MapControllerRoute(
     name: "default",

@@ -1,0 +1,105 @@
+﻿@model List<CarRentalService.Models.AccidentReport>
+
+@{
+    ViewData["Title"] = "Accident Reports (Admin)";
+}
+
+<div class="container mt-4 mb-5">
+
+    <h2 class="fw-bold mb-4">All Accident Reports</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No accident reports submitted.
+        </div>
+    }
+    else
+    {
+        <div class="accident-details-box">
+            <table class="table table-bordered table-hover shadow-sm accident-table">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Full Name</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td>@r.Id</td>
+                        <td>@r.User?.UserName</td>
+                        <td>@r.FullName</td>
+                        <td>@r.AccidentDate.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@r.Location</td>
+                        <td>@r.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>
+
+                            <button class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#details-@r.Id">
+                                View
+                            </button>
+
+                            <form method="post"
+                                  asp-action="DeleteAccidentReport"
+                                  class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <button type="submit"
+                                        class="btn btn-sm btn-danger">
+                                    Delete
+                                </button>
+                            </form>
+
+                        </td>
+                    </tr>
+
+                    <tr class="collapse" id="details-@r.Id">
+                        <td colspan="7">
+
+                            <div class="p-3 bg-light">
+
+                                <strong>Driver:</strong> @r.FullName <br />
+                                <strong>OIB:</strong> @r.Oib <br />
+                                <strong>License:</strong> @r.DriverLicenseNumber <br />
+                                <strong>Phone:</strong> @r.Phone <br /><br />
+
+                                <strong>Weather:</strong> @r.Weather <br />
+                                <strong>Road:</strong> @r.RoadCondition <br />
+                                <strong>Speed:</strong> @r.Speed km/h <br />
+                                <strong>Police notified:</strong> @(r.PoliceNotified ? "Yes" : "No") <br /><br />
+
+                                <strong>Damage:</strong><br />
+                                @r.DamageDescription <br /><br />
+
+                                @if (!string.IsNullOrEmpty(r.OtherPartyName))
+                                {
+                                    <strong>Other Party:</strong> @r.OtherPartyName <br />
+                                    <strong>Plate:</strong> @r.OtherPartyPlate
+                                }
+
+                            </div>
+
+                        </td>
+                    </tr>
+                }
+                </tbody>
+
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-accidents.js" asp-append-version="true"></script>
+}
+

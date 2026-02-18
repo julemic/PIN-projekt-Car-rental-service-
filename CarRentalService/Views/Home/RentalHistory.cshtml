@@ -1,0 +1,69 @@
+﻿@model List<CarRentalService.Models.RentalViewModel>
+
+@{
+    ViewData["Title"] = "Rental History";
+}
+
+<div class="container mt-4" style="padding-bottom:140px;">
+    <h1 class="mb-4">Rental History</h1>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No previous rentals found.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var r in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100 opacity-75">
+
+                        <div class="card-body">
+
+                            <h5 class="card-title">
+                                @r.Brand @r.Model
+                            </h5>
+
+                            <p class="mb-1">
+                                <strong>Pickup:</strong>
+                                @r.Pickup.ToString("dd.MM.yyyy HH:mm")
+                            </p>
+
+                            <p class="mb-1">
+                                <strong>Return:</strong>
+                                @r.Return.ToString("dd.MM.yyyy HH:mm")
+                            </p>
+
+                            <p class="mb-1">
+                                <strong>Insurance:</strong>
+                                @r.InsuranceName
+                            </p>
+
+                            <p class="mb-1">
+                                <strong>Total paid:</strong>
+                                @r.TotalPrice €
+                            </p>
+
+                            <p class="mb-1">
+                                <strong>Status:</strong>
+                                @r.Status
+                            </p>
+
+                            @if (r.Status == CarRentalService.Models.RentalStatus.Returned && r.ReturnedAt != null)
+                            {
+                                <p class="text-muted small mt-2">
+                                    Returned on:
+                                    @r.ReturnedAt.Value.ToString("dd.MM.yyyy HH:mm")
+                                </p>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

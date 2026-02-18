@@ -24,7 +24,7 @@ namespace CarRentalService.Data
                         Category = "Sedan",
                         DailyPrice = 35,
                         TotalQuantity = 5,
-                        ImageUrl = "/css/skoda-octavia.png",
+                        ImageUrl = "/images/skoda-octavia.png",
                         IsActive = true
                     },
                     new Vehicle
@@ -34,7 +34,7 @@ namespace CarRentalService.Data
                         Category = "Coupe",
                         DailyPrice = 75,
                         TotalQuantity = 3,
-                        ImageUrl = "/css/audi_a5.png",
+                        ImageUrl = "/images/audi_a5.png",
                         IsActive = true
                     },
                     new Vehicle
@@ -44,7 +44,7 @@ namespace CarRentalService.Data
                         Category = "Hatchback",
                         DailyPrice = 40,
                         TotalQuantity = 6,
-                        ImageUrl = "/css/vw-golf-8.png",
+                        ImageUrl = "/images/vw-golf-8.png",
                         IsActive = true
                     },
                     new Vehicle
@@ -54,7 +54,7 @@ namespace CarRentalService.Data
                         Category = "Hatchback",
                         DailyPrice = 30,
                         TotalQuantity = 4,
-                        ImageUrl = "/css/renault-clio-2024.png",
+                        ImageUrl = "/images/renault-clio-2024.png",
                         IsActive = true
                     }
                 );
