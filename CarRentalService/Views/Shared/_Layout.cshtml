@@ -26,7 +26,7 @@
                     Car Rental Service
                 </a>
 
-                <!-- Mobile toggle -->
+                <!-- Mobile  -->
                 <button class="navbar-toggler"
                         type="button"
                         data-bs-toggle="collapse"
@@ -82,6 +82,15 @@
                                     <li>
                                         <a class="dropdown-item"
                                            asp-controller="Home"
+                                           asp-action="Profile">
+                                            Profile
+                                        </a>
+                                    </li>
+
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Home"
                                            asp-action="MyRentals">
                                             My Rentals
                                         </a>
@@ -98,7 +107,7 @@
                                     <li>
                                         <a class="dropdown-item"
                                            asp-controller="Home"
-                                           asp-action="AccidentReport">
+                                           asp-action="CreateAccidentReport">
                                             Accident Report
                                         </a>
                                     </li>
@@ -124,17 +133,16 @@
                                     <li><hr class="dropdown-divider"></li>
 
                                     <li>
-                                        <form method="post"
-                                              asp-area="Identity"
-                                              asp-page="/Account/Logout"
-                                              asp-route-returnUrl="@Url.Action("Index", "Home")"
-                                              class="dropdown-item p-0">
+                                        <form asp-controller="Home"
+                                              asp-action="Logout"
+                                              method="post"
+                                              class="dropdown-item p-0 m-0">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit"
-                                                    class="btn btn-link dropdown-item">
+                                            <button type="submit" class="dropdown-item">
                                                 Logout
                                             </button>
                                         </form>
+
                                     </li>
 
                                 </ul>

@@ -49,11 +49,15 @@
                                 View
                             </button>
 
-                            <form method="post"
-                                  asp-action="DeleteAccidentReport"
+                            <form asp-action="DeleteAccidentReport"
+                                  asp-controller="Home"
+                                  method="post"
                                   class="d-inline">
+
                                 @Html.AntiForgeryToken()
+
                                 <input type="hidden" name="id" value="@r.Id" />
+
                                 <button type="submit"
                                         class="btn btn-sm btn-danger">
                                     Delete

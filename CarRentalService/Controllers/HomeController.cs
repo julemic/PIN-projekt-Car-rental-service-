@@ -2,11 +2,14 @@
 using CarRentalService.Models;
 using CarRentalService.Services;
 using CarRentalService.Services.Pdf;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+
+
 
 namespace CarRentalService.Controllers
 {
@@ -35,7 +38,6 @@ namespace CarRentalService.Controllers
         
         // CARS (GET)
         
-
         [HttpGet]
         public async Task<IActionResult> Cars()
         {
@@ -49,8 +51,8 @@ namespace CarRentalService.Controllers
         }
 
         
-        // CARS 
-
+        // CARS (POST SEARCH)
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cars(CarsSearchVm vm, string Category = "All offers", string Sort = "")
@@ -123,9 +125,52 @@ namespace CarRentalService.Controllers
             return View(vm);
         }
 
-        
-        // RENT 
+        // PROFILE
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
 
+            return View(user);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ApplicationUser model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.DateOfBirth = model.DateOfBirth;
+            user.ResidenceAddress = model.ResidenceAddress;
+            user.City = model.City;
+            user.Nationality = model.Nationality;
+            user.Oib = model.Oib;
+            user.DriverLicenseNumber = model.DriverLicenseNumber;
+            user.IdCardNumber = model.IdCardNumber;
+
+            user.IsVerified = true;
+            user.VerifiedAt = DateTime.UtcNow;
+
+            await _userManager.UpdateAsync(user);
+
+            TempData["Msg"] = "Profile updated successfully.";
+            return RedirectToAction(nameof(Profile));
+        }
+
+
+
+        
+        // RENT
+        
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -146,7 +191,7 @@ namespace CarRentalService.Controllers
             if (!user.IsVerified)
             {
                 TempData["Msg"] = "You must verify your identity before renting.";
-                return RedirectToAction("CompleteProfile");
+                return RedirectToAction(nameof(Profile));
             }
 
             var vehicle = await _db.Vehicles
@@ -169,8 +214,6 @@ namespace CarRentalService.Controllers
                 InsurancePlan = vm.SelectedInsurancePlan,
                 Status = RentalStatus.Reserved,
                 CreatedAt = DateTime.UtcNow,
-
-                
                 DepositPaid = pricing.Deposit,
                 IsDepositPaid = true,
                 DepositPaidAt = DateTime.UtcNow
@@ -179,13 +222,13 @@ namespace CarRentalService.Controllers
             _db.Rentals.Add(rental);
             await _db.SaveChangesAsync();
 
-            TempData["Msg"] = $"Reservation created. Deposit of {pricing.Deposit} € successfully paid.";
+            TempData["Msg"] = $"Deposit of {pricing.Deposit} € successfully paid.";
             return RedirectToAction(nameof(MyRentals));
         }
 
         
-        // RETURN CAR 
-
+        // RETURN CAR (final payment)
+        
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -211,64 +254,146 @@ namespace CarRentalService.Controllers
             rental.FinalAmountPaid = remainingAmount;
             rental.IsFullyPaid = true;
             rental.FullyPaidAt = DateTime.UtcNow;
-
             rental.Status = RentalStatus.Returned;
             rental.ReturnedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
 
-            TempData["Msg"] = $"Vehicle returned. Remaining amount of {remainingAmount} € successfully paid.";
+            TempData["Msg"] = $"Remaining amount of {remainingAmount} € successfully paid.";
             return RedirectToAction(nameof(MyRentals));
         }
 
         
-        // CANCEL RESERVATION 
+        // ACCIDENT REPORT (GET)
+        
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> CreateAccidentReport(int rentalId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            // rentals korisnika za dropdown (zadnjih 50)
+            var rentals = await _db.Rentals
+                .Include(r => r.Vehicle)
+                .Where(r => r.UserId == user.Id)
+                .OrderByDescending(r => r.CreatedAt)
+                .Take(50)
+                .ToListAsync();
+
+            ViewBag.UserRentals = rentals;
+
+            // automatski popuni vozača iz ApplicationUser
+            var model = new AccidentReport
+            {
+                FullName = $"{user.FirstName} {user.LastName}",
+                Oib = user.Oib,
+                DriverLicenseNumber = user.DriverLicenseNumber,
+                Phone = user.PhoneNumber
+            };
+
+            return View(model);
+        }
 
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CancelReservation(int rentalId)
+        public async Task<IActionResult> CreateAccidentReport(AccidentReport model)
         {
-            var userId = _userManager.GetUserId(User);
-            if (userId == null) return Challenge();
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
 
-            var rental = await _db.Rentals
+            // UserId se postavlja server-side (ne iz forme)
+            ModelState.Remove(nameof(AccidentReport.UserId));
+            ModelState.Remove(nameof(AccidentReport.User));
+
+            // Ponovno napuni rentals za slučaj da validacija faila i vraća view
+            var rentals = await _db.Rentals
                 .Include(r => r.Vehicle)
-                .FirstOrDefaultAsync(r =>
-                    r.Id == rentalId &&
-                    r.UserId == userId &&
-                    r.Status == RentalStatus.Reserved);
+                .Where(r => r.UserId == user.Id)
+                .OrderByDescending(r => r.CreatedAt)
+                .Take(50)
+                .ToListAsync();
 
-            if (rental == null) return NotFound();
+            ViewBag.UserRentals = rentals;
 
-            var pricing = _pricingService.CalculatePricing(
-                rental.Vehicle!,
-                rental.Pickup,
-                rental.Return,
-                rental.InsurancePlan);
+            // sigurnosno: Rental mora biti od tog usera
+            var rentalExists = await _db.Rentals.AnyAsync(r => r.Id == model.RentalId && r.UserId == user.Id);
+            if (!rentalExists)
+                ModelState.AddModelError(nameof(AccidentReport.RentalId), "Please select a valid rental.");
 
-            rental.Status = RentalStatus.Cancelled;
+            if (!ModelState.IsValid)
+                return View(model);
 
-            if (pricing.CanFreeCancel)
-            {
-                rental.DepositPaid = 0;
-                rental.IsDepositPaid = false;
-                TempData["Msg"] = "Reservation cancelled. Deposit refunded.";
-            }
-            else
-            {
-                TempData["Msg"] = "Reservation cancelled. Deposit retained.";
-            }
+            model.UserId = user.Id;
+            model.CreatedAt = DateTime.UtcNow;
 
+            _db.AccidentReports.Add(model);
             await _db.SaveChangesAsync();
 
-            return RedirectToAction(nameof(MyRentals));
+            TempData["Msg"] = "Accident report submitted successfully.";
+            return RedirectToAction(nameof(CreateAccidentReport));
+        }
+        //download pdf 
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAccidentReportPdf(AccidentReport model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            ModelState.Remove("UserId");
+
+            if (!ModelState.IsValid)
+                return View("CreateAccidentReport", model);
+
+            model.UserId = user.Id;
+            model.CreatedAt = DateTime.UtcNow;
+
+            _db.AccidentReports.Add(model);
+            await _db.SaveChangesAsync();
+
+            var pdfBytes = _pdfGenerator.Generate(model);
+
+            return File(pdfBytes,
+                "application/pdf",
+                $"AccidentReport_{DateTime.Now:yyyyMMddHHmm}.pdf");
         }
 
-        
-        // RENTAL VIEWS
-        
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> AdminAccidentReports()
+        {
+            var reports = await _db.AccidentReports
+                .Include(r => r.User)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
 
+            return View(reports);
+        }
+
+        // ADMIN DELETE ACCIDENT REPORT
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAccidentReport(int id)
+        {
+            var report = await _db.AccidentReports.FindAsync(id);
+
+            if (report == null)
+                return NotFound();
+
+            _db.AccidentReports.Remove(report);
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(AdminAccidentReports));
+        }
+
+
+        
+        // RENTAL VIEW BUILDER
+        
         [Authorize]
         public async Task<IActionResult> MyRentals()
         {
@@ -283,10 +408,6 @@ namespace CarRentalService.Controllers
                 r => r.Status == RentalStatus.Returned ||
                      r.Status == RentalStatus.Cancelled);
         }
-
-        
-        // SHARED BUILDER
-        
 
         private async Task<IActionResult> BuildRentalView(
             string viewName,
@@ -330,10 +451,6 @@ namespace CarRentalService.Controllers
             return View(viewName, viewModel);
         }
 
-        
-        // HELPERS
-        
-
         private async Task FillCarsViewBags(string category, string sort)
         {
             ViewBag.Categories = await _db.Vehicles
@@ -346,5 +463,16 @@ namespace CarRentalService.Controllers
             ViewBag.SelectedCategory = category;
             ViewBag.Sort = sort;
         }
+
+        // LOGOUT
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

@@ -3,57 +3,55 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CarRentalService.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser, IValidatableObject
     {
-        
-
-        [Required]
         [MaxLength(50)]
-        public string FirstName { get; set; } = null!;
+        public string? FirstName { get; set; }
 
-        [Required]
         [MaxLength(50)]
-        public string LastName { get; set; } = null!;
+        public string? LastName { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
-        [Range(typeof(DateTime), "1940-01-01", "2100-01-01",ErrorMessage = "Date of birth must be after 01.01.1940.")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
-
-        [Required]
         [MaxLength(100)]
-        public string ResidenceAddress { get; set; } = null!;
+        public string? ResidenceAddress { get; set; }
 
-        [Required]
         [MaxLength(50)]
-        public string City { get; set; } = null!;
+        public string? City { get; set; }
 
-        [Required]
         [MaxLength(50)]
-        public string Nationality { get; set; } = null!;
+        public string? Nationality { get; set; }
 
-        
-
-        [Required]
         [RegularExpression(@"^\d{11}$",
             ErrorMessage = "OIB must contain exactly 11 digits.")]
-        public string Oib { get; set; } = null!;
+        public string? Oib { get; set; }
 
-        [Required]
         [RegularExpression(@"^\d{8}$",
             ErrorMessage = "Driver license number must contain exactly 8 digits.")]
-        public string DriverLicenseNumber { get; set; } = null!;
+        public string? DriverLicenseNumber { get; set; }
 
-        [Required]
         [RegularExpression(@"^[A-Za-z0-9]{9}$",
             ErrorMessage = "ID card number must contain exactly 9 characters.")]
-        public string IdCardNumber { get; set; } = null!;
-
-        
+        public string? IdCardNumber { get; set; }
 
         public bool IsVerified { get; set; } = false;
-
         public DateTime? VerifiedAt { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (DateOfBirth.HasValue)
+            {
+                var today = DateTime.Today;
+                var minAllowedDate = today.AddYears(-18);
+
+                if (DateOfBirth.Value > minAllowedDate)
+                {
+                    yield return new ValidationResult(
+                        "You must be at least 18 years old.",
+                        new[] { nameof(DateOfBirth) });
+                }
+            }
+        }
     }
 }

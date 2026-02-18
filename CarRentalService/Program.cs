@@ -3,6 +3,7 @@ using CarRentalService.Models;
 using CarRentalService.Services;
 using CarRentalService.Services.Pdf;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure; QuestPDF.Settings.License = LicenseType.Community;
 
@@ -16,6 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<AccidentReportPdfGenerator>();
+builder.Services.AddTransient<IEmailSender, FakeEmailSender>();
+
 
 
 builder.Services

@@ -174,12 +174,12 @@
             </div>
 
             <!-- VEHICLES -->
-            @if (!vehicles.Any())
-            {
+    @if (!vehicles.Any())
+    {
                 <p>No vehicles found.</p>
-            }
-            else
-            {
+    }
+    else
+    {
                 <div class="row">
                     @foreach (var v in vehicles)
                     {
@@ -190,9 +190,10 @@
                         <div class="col-md-3 mb-4">
                             <div class="card h-100 @(available <= 0 ? "opacity-50" : "")">
 
-                                <img src="@v.ImageUrl"
+                                <img src="~/images/@v.ImageUrl"
                                      class="card-img-top"
-                                     style="height:160px; object-fit:contain;" />
+                                     style="height:160px; object-fit:contain; padding:15px;"
+                                     alt="@v.Brand @v.Model" />
 
                                 <div class="card-body">
                                     <h5>@v.Brand @v.Model</h5>
@@ -222,8 +223,8 @@
                         </div>
                     }
                 </div>
-            }
-        }
+                }
+    }
 
     </form>
 </div>

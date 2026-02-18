@@ -8,8 +8,9 @@ namespace CarRentalService.Models
     {
         public int Id { get; set; }
 
-        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Rental is required.")]
         public int RentalId { get; set; }
+
 
         [Required]
         public string UserId { get; set; } = null!;
