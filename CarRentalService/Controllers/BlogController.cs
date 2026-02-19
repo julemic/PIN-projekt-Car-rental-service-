@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CarRentalService.Constants;
 
 namespace CarRentalService.Controllers
 {
@@ -12,15 +13,18 @@ namespace CarRentalService.Controllers
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _config;
 
         public BlogController(
             ApplicationDbContext db,
             UserManager<ApplicationUser> userManager,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env,
+            IConfiguration config)
         {
             _db = db;
             _userManager = userManager;
             _env = env;
+            _config = config;
         }
 
         // LIST
@@ -46,24 +50,33 @@ namespace CarRentalService.Controllers
         }
 
         // CREATE
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet]
         public IActionResult Create()
         {
+            ViewData["TinyMceApiKey"] = _config["TinyMce:ApiKey"];
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BlogPost model, IFormFile? imageFile)
         {
+            ViewData["TinyMceApiKey"] = _config["TinyMce:ApiKey"];
+
             if (!ModelState.IsValid)
                 return View(model);
 
             if (imageFile != null)
             {
-                model.ImagePath = await SaveImage(imageFile);
+                var path = await SaveImage(imageFile);
+                if (path == null)
+                {
+                    ModelState.AddModelError("", "Invalid image. Allowed: .jpg, .jpeg, .png, .webp (max 5MB).");
+                    return View(model);
+                }
+                model.ImagePath = path;
             }
 
             var user = await _userManager.GetUserAsync(User);
@@ -77,7 +90,7 @@ namespace CarRentalService.Controllers
         }
 
         // EDIT
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -85,14 +98,17 @@ namespace CarRentalService.Controllers
             if (post == null)
                 return NotFound();
 
+            ViewData["TinyMceApiKey"] = _config["TinyMce:ApiKey"];
             return View(post);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, BlogPost model, IFormFile? imageFile)
         {
+            ViewData["TinyMceApiKey"] = _config["TinyMce:ApiKey"];
+
             var post = await _db.BlogPosts.FindAsync(id);
             if (post == null)
                 return NotFound();
@@ -107,7 +123,14 @@ namespace CarRentalService.Controllers
 
             if (imageFile != null)
             {
-                post.ImagePath = await SaveImage(imageFile);
+                var path = await SaveImage(imageFile);
+                if (path == null)
+                {
+                    ModelState.AddModelError("", "Invalid image. Allowed: .jpg, .jpeg, .png, .webp (max 5MB).");
+                    return View(model);
+                }
+                DeleteImage(post.ImagePath);
+                post.ImagePath = path;
             }
 
             await _db.SaveChangesAsync();
@@ -116,11 +139,14 @@ namespace CarRentalService.Controllers
         }
 
         // DELETE
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            if (!ModelState.IsValid)
+                return RedirectToAction(nameof(Index));
+
             var post = await _db.BlogPosts.FindAsync(id);
             if (post == null)
                 return NotFound();
@@ -131,20 +157,44 @@ namespace CarRentalService.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<string> SaveImage(IFormFile file)
+        private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
         {
-            var uploads = Path.Combine(_env.WebRootPath, "uploads/blog");
+            ".jpg", ".jpeg", ".png", ".webp"
+        };
+
+        private const long MaxFileSize = 5 * 1024 * 1024;
+
+        private async Task<string?> SaveImage(IFormFile file)
+        {
+            var ext = Path.GetExtension(file.FileName);
+            if (!AllowedExtensions.Contains(ext))
+                return null;
+
+            if (file.Length > MaxFileSize)
+                return null;
+
+            var uploads = Path.Combine(_env.WebRootPath, Upload.BlogImagePath);
 
             if (!Directory.Exists(uploads))
                 Directory.CreateDirectory(uploads);
 
-            var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+            var fileName = Guid.NewGuid() + ext;
             var path = Path.Combine(uploads, fileName);
 
             using var stream = new FileStream(path, FileMode.Create);
             await file.CopyToAsync(stream);
 
-            return "/uploads/blog/" + fileName;
+            return Upload.BlogImageUrlPrefix + fileName;
+        }
+
+        private void DeleteImage(string? imagePath)
+        {
+            if (string.IsNullOrEmpty(imagePath))
+                return;
+
+            var fullPath = Path.Combine(_env.WebRootPath, imagePath.TrimStart('/'));
+            if (System.IO.File.Exists(fullPath))
+                System.IO.File.Delete(fullPath);
         }
     }
 }

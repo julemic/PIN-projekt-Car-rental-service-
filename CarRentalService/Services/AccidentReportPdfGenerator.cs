@@ -1,4 +1,5 @@
-﻿using CarRentalService.Models;
+﻿using CarRentalService.Constants;
+using CarRentalService.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -9,8 +10,6 @@ namespace CarRentalService.Services.Pdf
     {
         public byte[] Generate(AccidentReport report)
         {
-            QuestPDF.Settings.License = LicenseType.Community;
-
             return Document.Create(container =>
             {
                 container.Page(page =>
@@ -34,7 +33,7 @@ namespace CarRentalService.Services.Pdf
 
                         col.Item().LineHorizontal(1);
 
-                        col.Item().Text($"Accident date: {report.AccidentDate:dd.MM.yyyy HH:mm}");
+                        col.Item().Text($"Accident date: {report.AccidentDate.ToString(Formats.DateWithTime)}");
                         col.Item().Text($"Location: {report.Location}");
                         col.Item().Text($"Weather: {report.Weather}");
                         col.Item().Text($"Road condition: {report.RoadCondition}");
@@ -60,7 +59,7 @@ namespace CarRentalService.Services.Pdf
                         .Text(x =>
                         {
                             x.Span("Generated on ");
-                            x.Span(DateTime.Now.ToString("dd.MM.yyyy HH:mm"));
+                            x.Span(DateTime.Now.ToString(Formats.DateWithTime));
                         });
                 });
             }).GeneratePdf();

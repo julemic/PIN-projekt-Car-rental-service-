@@ -127,19 +127,14 @@
 
                             @if (r.Status == RentalStatus.Reserved)
                             {
-                                <form method="post"
-                                      asp-action="CancelReservation"
-                                      class="m-0">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden"
-                                           name="rentalId"
-                                           value="@r.Id" />
+                                <form asp-action="CancelReservation" method="post">
+                                    <input type="hidden" name="rentalId" value="@r.Id" />
 
-                                    <button type="submit"
-                                            class="btn btn-outline-danger btn-sm">
-                                        Cancel reservation
+                                    <button type="submit" class="btn btn-danger">
+                                        Cancel Reservation
                                     </button>
                                 </form>
+
 
                                 <form method="post"
                                       asp-action="ReturnCar"
@@ -164,3 +159,7 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script src="~/js/myrentals.js" asp-append-version="true"></script>
+}

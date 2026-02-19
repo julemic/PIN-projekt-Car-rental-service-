@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using CarRentalService.Constants;
 
 namespace CarRentalService.Models
 {
@@ -14,7 +15,7 @@ namespace CarRentalService.Models
 
         public int? VehicleId { get; set; }
 
-        public string Category { get; set; } = "All offers";
+        public string Category { get; set; } = VehicleCategories.AllOffers;
 
         [Required(ErrorMessage = "Please choose insurance.")]
         public InsurancePlan SelectedInsurancePlan { get; set; } = InsurancePlan.Basic;

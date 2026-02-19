@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using CarRentalService.Constants;
 
 
 
@@ -41,35 +42,35 @@ namespace CarRentalService.Controllers
         [HttpGet]
         public async Task<IActionResult> Cars()
         {
-            await FillCarsViewBags("All offers", "");
-            ViewBag.ShowVehicles = false;
-
-            return View(new CarsSearchVm
+            var model = new CarsViewModel
             {
-                SelectedInsurancePlan = InsurancePlan.Basic
-            });
+                Search = new CarsSearchVm { SelectedInsurancePlan = InsurancePlan.Basic },
+                Categories = await GetActiveCategories(),
+                SelectedCategory = VehicleCategories.AllOffers
+            };
+
+            return View(model);
         }
 
-        
-        // CARS (POST SEARCH)
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Cars(CarsSearchVm vm, string Category = "All offers", string Sort = "")
+        public async Task<IActionResult> Cars([Bind(Prefix = "Search")] CarsSearchVm vm, string Category = VehicleCategories.AllOffers, string Sort = "")
         {
-            await FillCarsViewBags(Category, Sort);
-
-            ViewBag.ShowVehicles = false;
-            ViewBag.Vehicles = new List<Vehicle>();
-            ViewBag.AvailableMap = new Dictionary<int, int>();
+            var model = new CarsViewModel
+            {
+                Search = vm,
+                Categories = await GetActiveCategories(),
+                SelectedCategory = Category,
+                Sort = Sort
+            };
 
             if (!ModelState.IsValid)
-                return View(vm);
+                return View(model);
 
             if (vm.Pickup == null || vm.Return == null)
             {
                 ModelState.AddModelError("", "Pickup and return date are required.");
-                return View(vm);
+                return View(model);
             }
 
             var pickup = vm.Pickup.Value.Date;
@@ -78,24 +79,24 @@ namespace CarRentalService.Controllers
             if (pickup < DateTime.Today)
             {
                 ModelState.AddModelError("", "Pickup date cannot be in the past.");
-                return View(vm);
+                return View(model);
             }
 
             if (ret <= pickup)
             {
                 ModelState.AddModelError("", "Return date must be after pickup date.");
-                return View(vm);
+                return View(model);
             }
 
             var query = _db.Vehicles.Where(v => v.IsActive);
 
-            if (!string.IsNullOrWhiteSpace(Category) && Category != "All offers")
+            if (!string.IsNullOrWhiteSpace(Category) && Category != VehicleCategories.AllOffers)
                 query = query.Where(v => v.Category == Category);
 
             query = Sort switch
             {
-                "price_asc" => query.OrderBy(v => v.DailyPrice),
-                "price_desc" => query.OrderByDescending(v => v.DailyPrice),
+                SortOptions.PriceAsc => query.OrderBy(v => v.DailyPrice),
+                SortOptions.PriceDesc => query.OrderByDescending(v => v.DailyPrice),
                 _ => query.OrderBy(v => v.Id)
             };
 
@@ -110,19 +111,18 @@ namespace CarRentalService.Controllers
                 .Select(g => new { g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Key, x => x.Count);
 
-            var availableMap = new Dictionary<int, int>();
-
-            foreach (var v in vehicles)
+            model.ShowVehicles = true;
+            model.Vehicles = vehicles.Select(v =>
             {
                 var used = overlapping.TryGetValue(v.Id, out var cnt) ? cnt : 0;
-                availableMap[v.Id] = Math.Max(0, v.TotalQuantity - used);
-            }
+                return new VehicleAvailability
+                {
+                    Vehicle = v,
+                    Available = Math.Max(0, v.TotalQuantity - used)
+                };
+            }).ToList();
 
-            ViewBag.ShowVehicles = true;
-            ViewBag.Vehicles = vehicles;
-            ViewBag.AvailableMap = availableMap;
-
-            return View(vm);
+            return View(model);
         }
 
         // PROFILE
@@ -160,9 +160,15 @@ namespace CarRentalService.Controllers
             user.IsVerified = true;
             user.VerifiedAt = DateTime.UtcNow;
 
-            await _userManager.UpdateAsync(user);
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
+                return View(model);
+            }
 
-            TempData["Msg"] = "Profile updated successfully.";
+            TempData[TempDataKeys.Message] = "Profile updated successfully.";
             return RedirectToAction(nameof(Profile));
         }
 
@@ -174,14 +180,14 @@ namespace CarRentalService.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Rent(CarsSearchVm vm)
+        public async Task<IActionResult> Rent([Bind(Prefix = "Search")] CarsSearchVm vm, int? VehicleId)
         {
             if (!ModelState.IsValid ||
-                vm.VehicleId == null ||
+                VehicleId == null ||
                 vm.Pickup == null ||
                 vm.Return == null)
             {
-                TempData["Msg"] = "Invalid rental data.";
+                TempData[TempDataKeys.Message] = "Invalid rental data.";
                 return RedirectToAction(nameof(Cars));
             }
 
@@ -190,12 +196,12 @@ namespace CarRentalService.Controllers
 
             if (!user.IsVerified)
             {
-                TempData["Msg"] = "You must verify your identity before renting.";
+                TempData[TempDataKeys.Message] = "You must verify your identity before renting.";
                 return RedirectToAction(nameof(Profile));
             }
 
             var vehicle = await _db.Vehicles
-                .FirstOrDefaultAsync(v => v.Id == vm.VehicleId && v.IsActive);
+                .FirstOrDefaultAsync(v => v.Id == VehicleId && v.IsActive);
 
             if (vehicle == null) return NotFound();
 
@@ -222,7 +228,7 @@ namespace CarRentalService.Controllers
             _db.Rentals.Add(rental);
             await _db.SaveChangesAsync();
 
-            TempData["Msg"] = $"Deposit of {pricing.Deposit} € successfully paid.";
+            TempData[TempDataKeys.Message] = $"Deposit of {pricing.Deposit} € successfully paid.";
             return RedirectToAction(nameof(MyRentals));
         }
 
@@ -234,6 +240,9 @@ namespace CarRentalService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReturnCar(int rentalId)
         {
+            if (!ModelState.IsValid)
+                return RedirectToAction(nameof(MyRentals));
+
             var userId = _userManager.GetUserId(User);
             if (userId == null) return Challenge();
 
@@ -241,10 +250,10 @@ namespace CarRentalService.Controllers
                 .Include(r => r.Vehicle)
                 .FirstOrDefaultAsync(r => r.Id == rentalId && r.UserId == userId);
 
-            if (rental == null) return NotFound();
+            if (rental?.Vehicle == null) return NotFound();
 
             var pricing = _pricingService.CalculatePricing(
-                rental.Vehicle!,
+                rental.Vehicle,
                 rental.Pickup,
                 rental.Return,
                 rental.InsurancePlan);
@@ -259,7 +268,7 @@ namespace CarRentalService.Controllers
 
             await _db.SaveChangesAsync();
 
-            TempData["Msg"] = $"Remaining amount of {remainingAmount} € successfully paid.";
+            TempData[TempDataKeys.Message] = $"Remaining amount of {remainingAmount} € successfully paid.";
             return RedirectToAction(nameof(MyRentals));
         }
 
@@ -331,7 +340,7 @@ namespace CarRentalService.Controllers
             _db.AccidentReports.Add(model);
             await _db.SaveChangesAsync();
 
-            TempData["Msg"] = "Accident report submitted successfully.";
+            TempData[TempDataKeys.Message] = "Accident report submitted successfully.";
             return RedirectToAction(nameof(CreateAccidentReport));
         }
         //download pdf 
@@ -343,7 +352,7 @@ namespace CarRentalService.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            ModelState.Remove("UserId");
+            ModelState.Remove(nameof(AccidentReport.UserId));
 
             if (!ModelState.IsValid)
                 return View("CreateAccidentReport", model);
@@ -357,11 +366,11 @@ namespace CarRentalService.Controllers
             var pdfBytes = _pdfGenerator.Generate(model);
 
             return File(pdfBytes,
-                "application/pdf",
+                System.Net.Mime.MediaTypeNames.Application.Pdf,
                 $"AccidentReport_{DateTime.Now:yyyyMMddHHmm}.pdf");
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet]
         public async Task<IActionResult> AdminAccidentReports()
         {
@@ -374,11 +383,14 @@ namespace CarRentalService.Controllers
         }
 
         // ADMIN DELETE ACCIDENT REPORT
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteAccidentReport(int id)
         {
+            if (!ModelState.IsValid)
+                return RedirectToAction(nameof(AdminAccidentReports));
+
             var report = await _db.AccidentReports.FindAsync(id);
 
             if (report == null)
@@ -390,10 +402,37 @@ namespace CarRentalService.Controllers
             return RedirectToAction(nameof(AdminAccidentReports));
         }
 
+        // CANCEL RESERVATION
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelReservation(int rentalId)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (userId == null) return Challenge();
 
-        
+            var rental = await _db.Rentals
+                .FirstOrDefaultAsync(r =>
+                    r.Id == rentalId &&
+                    r.UserId == userId &&
+                    r.Status == RentalStatus.Reserved);
+
+            if (rental == null)
+                return NotFound();
+
+            rental.Status = RentalStatus.Cancelled;
+
+            await _db.SaveChangesAsync();
+
+            TempData[TempDataKeys.Message] = "Reservation cancelled successfully.";
+
+            return RedirectToAction(nameof(MyRentals));
+        }
+
+
+
         // RENTAL VIEW BUILDER
-        
+
         [Authorize]
         public async Task<IActionResult> MyRentals()
         {
@@ -423,7 +462,7 @@ namespace CarRentalService.Controllers
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
 
-            var viewModel = rentals.Select(r =>
+            var viewModel = rentals.Where(r => r.Vehicle != null).Select(r =>
             {
                 var pricing = _pricingService.CalculatePricing(
                     r.Vehicle!,
@@ -440,6 +479,10 @@ namespace CarRentalService.Controllers
                     Status = r.Status,
                     Pickup = r.Pickup,
                     Return = r.Return,
+                    InsuranceName = pricing.InsuranceName,
+                    InsurancePricePerDay = pricing.InsurancePerDay,
+                    TotalDays = pricing.TotalDays,
+                    TotalPricePerDay = pricing.TotalPerDay,
                     TotalPrice = pricing.TotalPrice,
                     DepositAmount = pricing.Deposit,
                     FreeCancellationUntil = pricing.FreeCancellationUntil,
@@ -451,17 +494,14 @@ namespace CarRentalService.Controllers
             return View(viewName, viewModel);
         }
 
-        private async Task FillCarsViewBags(string category, string sort)
+        private async Task<List<string>> GetActiveCategories()
         {
-            ViewBag.Categories = await _db.Vehicles
+            return await _db.Vehicles
                 .Where(v => v.IsActive)
                 .Select(v => v.Category)
                 .Distinct()
                 .OrderBy(c => c)
                 .ToListAsync();
-
-            ViewBag.SelectedCategory = category;
-            ViewBag.Sort = sort;
         }
 
         // LOGOUT

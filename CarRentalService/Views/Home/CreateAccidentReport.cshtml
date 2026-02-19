@@ -6,7 +6,7 @@
     var rentals = ViewBag.UserRentals as List<Rental> ?? new List<Rental>();
 }
 
-<div class="container mt-4 mb-5" style="padding-bottom:120px;">
+<div class="container mt-4 mb-5 pb-5">
 
     <h2 class="mb-4 fw-bold">Accident Report</h2>
 
@@ -141,7 +141,7 @@
                     <label class="form-check-label" for="otherPartyCheck">Other party involved?</label>
                 </div>
 
-                <div id="otherPartySection" style="display:none;">
+                <div id="otherPartySection" class="other-party-section">
                     <div class="mb-3">
                         <label class="form-label">Other party name</label>
                         <input asp-for="OtherPartyName" class="form-control" />
@@ -179,18 +179,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        (function () {
-            const check = document.getElementById("otherPartyCheck");
-            const section = document.getElementById("otherPartySection");
-
-            function toggle() {
-                if (!check || !section) return;
-                section.style.display = check.checked ? "block" : "none";
-            }
-
-            check?.addEventListener("change", toggle);
-            toggle();
-        })();
-    </script>
+    <script src="~/js/accidentreport.js" asp-append-version="true"></script>
 }

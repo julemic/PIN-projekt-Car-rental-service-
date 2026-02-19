@@ -5,7 +5,10 @@ using CarRentalService.Services.Pdf;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using QuestPDF.Infrastructure; QuestPDF.Settings.License = LicenseType.Community;
+using QuestPDF.Infrastructure;
+using CarRentalService.Constants;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 
 
@@ -37,11 +40,17 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
 
-
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+    options.Filters.Add<CarRentalService.Filters.DbExceptionFilter>());
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<IRentalPricingService, RentalPricingService>();
+builder.Services.AddScoped<Ganss.Xss.HtmlSanitizer>();
 
 
 var app = builder.Build();
@@ -71,18 +80,14 @@ using (var scope = app.Services.CreateScope())
 
     var adminEmail = config["AdminSettings:Email"];
     var adminPassword = config["AdminSettings:Password"];
-    const string adminRole = "Admin";
-
     if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
-        throw new Exception("Admin credentials missing from secrets.json");
+        throw new InvalidOperationException("Admin credentials missing from secrets.json");
 
-    // Create role
-    if (!await roleManager.RoleExistsAsync(adminRole))
+    if (!await roleManager.RoleExistsAsync(Roles.Admin))
     {
-        await roleManager.CreateAsync(new IdentityRole(adminRole));
+        await roleManager.CreateAsync(new IdentityRole(Roles.Admin));
     }
 
-    // Create user
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
     if (adminUser == null)
@@ -116,9 +121,9 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    if (!await userManager.IsInRoleAsync(adminUser, adminRole))
+    if (!await userManager.IsInRoleAsync(adminUser, Roles.Admin))
     {
-        await userManager.AddToRoleAsync(adminUser, adminRole);
+        await userManager.AddToRoleAsync(adminUser, Roles.Admin);
     }
 }
 

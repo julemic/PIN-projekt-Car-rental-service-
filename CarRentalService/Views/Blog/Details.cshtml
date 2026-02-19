@@ -1,4 +1,5 @@
 ﻿@model CarRentalService.Models.BlogPost
+@inject Ganss.Xss.HtmlSanitizer HtmlSanitizer
 
 @{
     ViewData["Title"] = Model.Title;
@@ -16,11 +17,11 @@
     {
         <img src="@Model.ImagePath"
              class="img-fluid mb-4"
-             style="max-height:400px; object-fit:cover;" />
+             class="blog-detail-img" />
     }
 
     <div>
-        @Html.Raw(Model.Content)
+        @Html.Raw(HtmlSanitizer.Sanitize(Model.Content ?? ""))
     </div>
 
 

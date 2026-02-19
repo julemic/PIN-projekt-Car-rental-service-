@@ -3,10 +3,11 @@ using CarRentalService.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CarRentalService.Constants;
 
 namespace CarRentalService.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public class VehiclesController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -86,6 +87,9 @@ namespace CarRentalService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (!ModelState.IsValid)
+                return RedirectToAction(nameof(Index));
+
             var vehicle = await _db.Vehicles.FindAsync(id);
             if (vehicle == null) return NotFound();
 
@@ -96,7 +100,7 @@ namespace CarRentalService.Controllers
                 
                 vehicle.IsActive = false;
                 await _db.SaveChangesAsync();
-                TempData["Msg"] = "Vehicle has rentals, so it was deactivated instead of deleted.";
+                TempData[TempDataKeys.Message] = "Vehicle has rentals, so it was deactivated instead of deleted.";
                 return RedirectToAction(nameof(Index));
             }
 

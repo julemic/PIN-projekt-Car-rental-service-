@@ -183,13 +183,31 @@ body {
     margin-bottom: 80px;
 }
 
-.footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    padding: 20px 0;
+
+.vehicle-img {
+    height: 160px;
+    object-fit: contain;
+    padding: 15px;
 }
 
+.blog-card-img {
+    height: 180px;
+    object-fit: cover;
+}
+
+.blog-detail-img {
+    max-height: 400px;
+    object-fit: cover;
+}
+
+.blog-edit-img {
+    max-height: 250px;
+    object-fit: cover;
+}
+
+.other-party-section {
+    display: none;
+}
 
 @media (max-width: 768px) {
 

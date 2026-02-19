@@ -14,7 +14,8 @@ namespace CarRentalService.Data
             await context.Database.MigrateAsync();
 
             
-            if (!context.Vehicles.Any())
+            var hasVehicles = await context.Vehicles.AnyAsync();
+            if (!hasVehicles)
             {
                 context.Vehicles.AddRange(
                     new Vehicle

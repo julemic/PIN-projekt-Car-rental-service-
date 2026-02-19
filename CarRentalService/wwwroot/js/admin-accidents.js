@@ -1,6 +1,6 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
 
-    document.querySelectorAll("form[asp-action='DeleteAccidentReport']").forEach(form => {
+    document.querySelectorAll("form.delete-accident-form").forEach(form => {
 
         form.addEventListener("submit", function (e) {
 

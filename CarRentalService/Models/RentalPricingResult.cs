@@ -7,6 +7,7 @@
         public decimal TotalPerDay { get; set; }
         public decimal TotalPrice { get; set; }
         public decimal Deposit { get; set; }
+        public string InsuranceName { get; set; } = "";
         public DateTime FreeCancellationUntil { get; set; }
         public bool CanFreeCancel { get; set; }
     }
