@@ -5,7 +5,7 @@
 <div class="admin-page">
 <h1>Edit Vehicle</h1>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
 
@@ -40,8 +40,16 @@
     </div>
 
     <div class="mb-2">
-        <label>ImageUrl</label>
-        <input class="form-control" asp-for="ImageUrl" />
+        <label>Vehicle Image</label>
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="mb-2">
+                <img src="@Model.ImageUrl" alt="Current image" style="height:80px;object-fit:contain;background:#f8f9fa;border-radius:8px;padding:6px;" />
+                <small class="text-muted d-block">Current image — upload a new one to replace it</small>
+            </div>
+        }
+        <input type="file" name="imageFile" class="form-control" accept="image/jpeg,image/png,image/webp" />
+        <input type="hidden" asp-for="ImageUrl" />
     </div>
 
     <div class="form-check mb-3">

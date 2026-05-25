@@ -1,22 +1,241 @@
-﻿.admin-table {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+/* ---- Admin shared ---- */
+
+.admin-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 8px 60px;
 }
 
-    .admin-table thead {
-        background: #212529;
-        color: white;
-    }
+.admin-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
 
-    .admin-table th,
-    .admin-table td {
-        vertical-align: middle;
-    }
+.admin-page-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: #1f2937;
+    line-height: 1;
+}
 
+.admin-add-btn {
+    background: #1f2937;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s ease;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
 
+.admin-add-btn:hover {
+    background: #374151;
+    color: white;
+    transform: translateY(-1px);
+}
 
-.admin-btn {
+.admin-alert {
+    background: #fefce8;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    border-radius: 10px;
+    padding: 12px 16px;
     font-size: 14px;
-    padding: 6px 14px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-empty {
+    text-align: center;
+    padding: 64px 20px;
+    color: #9ca3af;
+}
+
+.admin-empty i {
+    font-size: 52px;
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.4;
+}
+
+.admin-empty p {
+    font-size: 16px;
+    margin: 0;
+}
+
+/* ---- Vehicles table ---- */
+
+.admin-table-wrap {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    border: 1px solid #f3f4f6;
+}
+
+.admin-vtable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.admin-vtable thead tr {
+    background: #1f2937;
+    color: white;
+}
+
+.admin-vtable th {
+    padding: 13px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+}
+
+.admin-vtable tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.15s ease;
+}
+
+.admin-vtable tbody tr:last-child {
+    border-bottom: none;
+}
+
+.admin-vtable tbody tr:hover {
+    background: #fafafa;
+}
+
+.admin-vtable td {
+    padding: 12px 16px;
+    vertical-align: middle;
+}
+
+.vtable-id {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 600;
+    width: 40px;
+}
+
+.vtable-img-cell {
+    width: 64px;
+    padding: 8px 12px;
+}
+
+.vtable-thumb {
+    width: 52px;
+    height: 36px;
+    object-fit: contain;
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 3px;
+    display: block;
+}
+
+.vtable-thumb-placeholder {
+    width: 52px;
+    height: 36px;
+    background: #f3f4f6;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d1d5db;
+    font-size: 16px;
+}
+
+.vtable-brand {
+    font-weight: 700;
+    color: #1f2937;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.vtable-model {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.vtable-muted {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.vtable-price {
+    font-weight: 700;
+    color: #1f2937;
+    white-space: nowrap;
+}
+
+.vstatus {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.vstatus--active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.vstatus--inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.vtable-actions {
+    white-space: nowrap;
+}
+
+.vtable-btn {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.15s ease;
+    margin-right: 4px;
+}
+
+.vtable-btn--edit {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.vtable-btn--edit:hover {
+    background: #fde68a;
+    color: #92400e;
+}
+
+.vtable-btn--delete {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.vtable-btn--delete:hover {
+    background: #fecaca;
+    color: #991b1b;
 }

@@ -27,7 +27,7 @@ namespace CarRentalService.Controllers
             _config = config;
         }
 
-        // LIST
+        // OVO JE LISTA
         public async Task<IActionResult> Index()
         {
             var posts = await _db.BlogPosts
@@ -37,7 +37,7 @@ namespace CarRentalService.Controllers
             return View(posts);
         }
 
-        // DETAILS
+        // OVO SU DETAILS
         public async Task<IActionResult> Details(int id)
         {
             var post = await _db.BlogPosts

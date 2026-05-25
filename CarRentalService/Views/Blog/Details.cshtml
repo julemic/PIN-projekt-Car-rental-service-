@@ -1,28 +1,35 @@
-﻿@model CarRentalService.Models.BlogPost
+@model CarRentalService.Models.BlogPost
 @inject Ganss.Xss.HtmlSanitizer HtmlSanitizer
 
 @{
     ViewData["Title"] = Model.Title;
 }
 
-<div class="container mt-5 mb-5">
+<div class="blog-detail">
 
-    <h1 class="fw-bold mb-3">@Model.Title</h1>
+    <a asp-action="Index" class="blog-detail-back">
+        <i class='bx bx-left-arrow-alt'></i> Back to Blog
+    </a>
 
-    <p class="text-muted">
+    <h1 class="blog-detail-title">@Model.Title</h1>
+
+    <div class="blog-detail-meta">
+        <i class='bx bx-calendar-alt' style="color:#ff3c00"></i>
         @Model.CreatedAt.ToString("dd.MM.yyyy")
-    </p>
+        @if (Model.UpdatedAt.HasValue)
+        {
+            <span class="blog-detail-meta-dot">·</span>
+            <span>Updated @Model.UpdatedAt.Value.ToString("dd.MM.yyyy")</span>
+        }
+    </div>
 
     @if (!string.IsNullOrEmpty(Model.ImagePath))
     {
-        <img src="@Model.ImagePath"
-             class="img-fluid mb-4"
-             class="blog-detail-img" />
+        <img src="@Model.ImagePath" alt="@Model.Title" class="blog-detail-hero" />
     }
 
-    <div>
+    <div class="blog-detail-content">
         @Html.Raw(HtmlSanitizer.Sanitize(Model.Content ?? ""))
     </div>
-
 
 </div>

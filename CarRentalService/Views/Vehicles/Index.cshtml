@@ -1,59 +1,92 @@
-﻿@model List<CarRentalService.Models.Vehicle>
+@model List<CarRentalService.Models.Vehicle>
 
 @{
     ViewData["Title"] = "Vehicles (Admin)";
 }
 
-<h1>Vehicles (Admin)</h1>
+<div class="admin-page">
 
-@if (TempData["Msg"] != null)
-{
-    <div class="alert alert-warning mt-2">
-        @TempData["Msg"]
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Vehicles</h1>
+        <a class="admin-add-btn" asp-controller="Vehicles" asp-action="Create">
+            <i class='bx bx-plus'></i> Add Vehicle
+        </a>
     </div>
-}
 
-<p class="mt-3">
-    <a class="btn" asp-controller="Vehicles" asp-action="Create">Add Vehicle</a>
-</p>
+    @if (TempData["Msg"] != null)
+    {
+        <div class="admin-alert">
+            <i class='bx bx-info-circle'></i> @TempData["Msg"]
+        </div>
+    }
 
-@if (Model == null || !Model.Any())
-{
-    <p>No vehicles in database.</p>
-}
-else
-{
-    <table class="table table-bordered mt-2">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>Category</th>
-                <th>Price / day</th>
-                <th>Total Qty</th>
-                <th>Active</th>
-                <th style="width:220px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var v in Model)
-            {
-                <tr>
-                    <td>@v.Id</td>
-                    <td>@v.Brand</td>
-                    <td>@v.Model</td>
-                    <td>@v.Category</td>
-                    <td>@v.DailyPrice</td>
-                    <td>@v.TotalQuantity</td>
-                    <td>@v.IsActive</td>
-                    <td>
-                        <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@v.Id">Edit</a>
-                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@v.Id">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+    @if (Model == null || !Model.Any())
+    {
+        <div class="admin-empty">
+            <i class='bx bx-car'></i>
+            <p>No vehicles in database.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-vtable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Image</th>
+                        <th>Brand / Model</th>
+                        <th>Category</th>
+                        <th>Price / day</th>
+                        <th>Qty</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model)
+                    {
+                        <tr>
+                            <td class="vtable-id">@v.Id</td>
+                            <td class="vtable-img-cell">
+                                @if (!string.IsNullOrEmpty(v.ImageUrl))
+                                {
+                                    var imgSrc = v.ImageUrl.StartsWith("/") ? v.ImageUrl : $"/images/{v.ImageUrl}";
+                                    <img src="@imgSrc" alt="@v.Brand @v.Model" class="vtable-thumb" />
+                                }
+                                else
+                                {
+                                    <div class="vtable-thumb-placeholder">
+                                        <i class='bx bx-image-alt'></i>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <div class="vtable-brand">@v.Brand</div>
+                                <div class="vtable-model">@v.Model</div>
+                            </td>
+                            <td class="vtable-muted">@v.Category</td>
+                            <td class="vtable-price">@v.DailyPrice €</td>
+                            <td class="vtable-muted">@v.TotalQuantity</td>
+                            <td>
+                                @if (v.IsActive)
+                                {
+                                    <span class="vstatus vstatus--active">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="vstatus vstatus--inactive">Inactive</span>
+                                }
+                            </td>
+                            <td class="vtable-actions">
+                                <a class="vtable-btn vtable-btn--edit" asp-action="Edit" asp-route-id="@v.Id">Edit</a>
+                                <a class="vtable-btn vtable-btn--delete" asp-action="Delete" asp-route-id="@v.Id">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 
+</div>

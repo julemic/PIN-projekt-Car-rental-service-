@@ -326,7 +326,7 @@ namespace CarRentalService.Controllers
 
             ViewBag.UserRentals = rentals;
 
-            // sigurnosno: Rental mora biti od tog usera
+            // sigurnosno Rental mora biti od tog usera
             var rentalExists = await _db.Rentals.AnyAsync(r => r.Id == model.RentalId && r.UserId == user.Id);
             if (!rentalExists)
                 ModelState.AddModelError(nameof(AccidentReport.RentalId), "Please select a valid rental.");

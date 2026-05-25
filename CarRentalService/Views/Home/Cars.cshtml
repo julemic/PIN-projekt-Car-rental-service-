@@ -5,203 +5,194 @@
     ViewData["Title"] = "Cars";
 }
 
-<div class="container mt-4 mb-5">
-
-    <h1 class="mb-4">Cars</h1>
+<div class="cars-page">
 
     <form asp-action="Cars" asp-controller="Home" method="post">
         @Html.AntiForgeryToken()
 
-        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div asp-validation-summary="All" class="alert alert-danger mb-4 rounded-3"></div>
+        }
 
-        <div class="row mb-4">
-
-            <div class="col-md-4">
-                <label asp-for="Search.Pickup" class="form-label"></label>
-                <input asp-for="Search.Pickup" type="date" class="form-control" />
-                <span asp-validation-for="Search.Pickup" class="text-danger"></span>
+        <div class="search-panel">
+            <div class="search-field">
+                <label asp-for="Search.Pickup" class="search-label">Pickup Date</label>
+                <input asp-for="Search.Pickup" type="date" class="search-input" />
+                <span asp-validation-for="Search.Pickup" class="search-error"></span>
             </div>
-
-            <div class="col-md-4">
-                <label asp-for="Search.Return" class="form-label"></label>
-                <input asp-for="Search.Return" type="date" class="form-control" />
-                <span asp-validation-for="Search.Return" class="text-danger"></span>
+            <div class="search-divider"></div>
+            <div class="search-field">
+                <label asp-for="Search.Return" class="search-label">Return Date</label>
+                <input asp-for="Search.Return" type="date" class="search-input" />
+                <span asp-validation-for="Search.Return" class="search-error"></span>
             </div>
-
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-danger w-100">
-                    Search
+            <div class="search-action">
+                <button type="submit" class="search-action-btn">
+                    <i class='bx bx-search-alt-2'></i> Search
                 </button>
             </div>
-
         </div>
 
         @if (TempData["Msg"] != null)
         {
-            <div class="alert alert-success">
-                @TempData["Msg"]
-            </div>
+            <div class="alert alert-success rounded-3 mb-4">@TempData["Msg"]</div>
         }
 
         @if (Model.ShowVehicles)
         {
-            <hr />
+            <div class="insurance-section">
+                <p class="cars-section-title">Choose Protection Plan</p>
 
-            <div class="card shadow-sm mb-4">
-                <div class="card-header fw-bold">
-                    Choose insurance
-                </div>
+                <div class="insurance-grid">
 
-                <div class="card-body">
-
-                    <div class="form-check mb-3 p-3 border rounded">
-                        <input class="form-check-input"
+                    <div class="insurance-option">
+                        <input class="insurance-radio"
                                asp-for="Search.SelectedInsurancePlan"
                                type="radio"
                                value="Basic"
                                id="basicPlan" />
-
-                        <label class="form-check-label w-100" for="basicPlan">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <strong>BASIC protect</strong><br />
-                                    <small class="text-muted">
-                                        ✔ Basic liability coverage<br />
-                                        ✔ Mandatory insurance included<br />
-                                        ✖ No damage reduction
-                                    </small>
-                                </div>
-                                <div class="fw-bold">
-                                    0 € / day
-                                </div>
+                        <label class="insurance-label" for="basicPlan">
+                            <div class="insurance-check-mark">&#10003;</div>
+                            <div class="insurance-top">
+                                <div class="insurance-plan-name">BASIC</div>
+                                <div class="insurance-plan-sub">protect</div>
+                                <div class="insurance-plan-price">Free</div>
                             </div>
+                            <ul class="insurance-feats">
+                                <li class="yes">Basic liability coverage</li>
+                                <li class="yes">Mandatory insurance included</li>
+                                <li class="no">No damage reduction</li>
+                            </ul>
                         </label>
                     </div>
 
-                    <div class="form-check mb-3 p-3 border rounded">
-                        <input class="form-check-input"
+                    <div class="insurance-option">
+                        <input class="insurance-radio"
                                asp-for="Search.SelectedInsurancePlan"
                                type="radio"
                                value="Medium"
                                id="mediumPlan" />
-
-                        <label class="form-check-label w-100" for="mediumPlan">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <strong>MEDIUM protect</strong><br />
-                                    <small class="text-muted">
-                                        ✔ Reduced damage liability<br />
-                                        ✔ Passenger insurance<br />
-                                        ✔ Partial theft protection
-                                    </small>
-                                </div>
-                                <div class="fw-bold">
-                                    17 € / day
-                                </div>
+                        <label class="insurance-label" for="mediumPlan">
+                            <div class="insurance-check-mark">&#10003;</div>
+                            <div class="insurance-top">
+                                <div class="insurance-plan-name">MEDIUM</div>
+                                <div class="insurance-plan-sub">protect</div>
+                                <div class="insurance-plan-price">17€ <span class="price-per-day">/day</span></div>
                             </div>
+                            <ul class="insurance-feats">
+                                <li class="yes">Reduced damage liability</li>
+                                <li class="yes">Passenger insurance</li>
+                                <li class="yes">Partial theft protection</li>
+                            </ul>
                         </label>
                     </div>
 
-                    <div class="form-check p-3 border rounded">
-                        <input class="form-check-input"
+                    <div class="insurance-option">
+                        <input class="insurance-radio"
                                asp-for="Search.SelectedInsurancePlan"
                                type="radio"
                                value="Total"
                                id="totalPlan" />
-
-                        <label class="form-check-label w-100" for="totalPlan">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <strong>TOTAL protect</strong><br />
-                                    <small class="text-muted">
-                                        ✔ Full damage coverage<br />
-                                        ✔ Theft protection<br />
-                                        ✔ No excess / no hidden costs
-                                    </small>
-                                </div>
-                                <div class="fw-bold">
-                                    22 € / day
-                                </div>
+                        <label class="insurance-label" for="totalPlan">
+                            <div class="insurance-check-mark">&#10003;</div>
+                            <div class="insurance-top">
+                                <div class="insurance-plan-name">TOTAL</div>
+                                <div class="insurance-plan-sub">protect</div>
+                                <div class="insurance-plan-price">22€ <span class="price-per-day">/day</span></div>
                             </div>
+                            <ul class="insurance-feats">
+                                <li class="yes">Full damage coverage</li>
+                                <li class="yes">Full theft protection</li>
+                                <li class="yes">No excess / no hidden costs</li>
+                            </ul>
                         </label>
                     </div>
 
-                    <span asp-validation-for="Search.SelectedInsurancePlan"
-                          class="text-danger d-block mt-2"></span>
-
                 </div>
+
+                <span asp-validation-for="Search.SelectedInsurancePlan" class="search-error d-block mt-2"></span>
             </div>
 
-
-            <div class="d-flex mb-4 align-items-center">
-
-                <div class="me-3">
-                    <button type="submit" name="Category" value="All offers" class="btn btn-outline-dark btn-sm">
+            <div class="cars-filters-bar">
+                <div class="category-pills-wrap">
+                    <button type="submit" name="Category" value="All offers" class="cat-pill">
                         All offers
                     </button>
-
                     @foreach (var c in Model.Categories.Where(x => x != "All offers"))
                     {
-                        <button type="submit" name="Category" value="@c" class="btn btn-outline-dark btn-sm">
+                        <button type="submit" name="Category" value="@c" class="cat-pill">
                             @c
                         </button>
                     }
                 </div>
-
-                <div class="ms-auto">
-                    <select name="Sort" onchange="this.form.submit()" class="form-select form-select-sm">
-                        <option value="">Sort by</option>
-                        <option value="price_asc" selected="@(Model.Sort == "price_asc")">
-                            Price (lowest)
-                        </option>
-                        <option value="price_desc" selected="@(Model.Sort == "price_desc")">
-                            Price (highest)
-                        </option>
+                <div>
+                    <select name="Sort" onchange="this.form.submit()" class="cars-sort-select">
+                        <option value="">Sort by price</option>
+                        <option value="price_asc" selected="@(Model.Sort == "price_asc")">Lowest first</option>
+                        <option value="price_desc" selected="@(Model.Sort == "price_desc")">Highest first</option>
                     </select>
                 </div>
-
             </div>
 
             @if (!Model.Vehicles.Any())
             {
-                <p>No vehicles found.</p>
+                <div class="cars-empty-state">
+                    <i class='bx bx-car'></i>
+                    <p>No vehicles available for selected dates.</p>
+                </div>
             }
             else
             {
-                <div class="row">
+                <div class="vehicles-grid">
                     @foreach (var item in Model.Vehicles)
                     {
-                        <div class="col-md-3 mb-4">
-                            <div class="card h-100 @(item.Available <= 0 ? "opacity-50" : "")">
-
-                                <img src="~/images/@item.Vehicle.ImageUrl"
-                                     class="card-img-top vehicle-img"
+                        <div class="vcard @(item.Available <= 0 ? "vcard--unavailable" : "")">
+                            <div class="vcard-img-wrap">
+                                <img src="@(item.Vehicle.ImageUrl?.StartsWith("/") == true ? item.Vehicle.ImageUrl : $"/images/{item.Vehicle.ImageUrl}")"
                                      alt="@item.Vehicle.Brand @item.Vehicle.Model" />
-
-                                <div class="card-body">
-                                    <h5>@item.Vehicle.Brand @item.Vehicle.Model</h5>
-                                    <p><b>@item.Vehicle.DailyPrice €</b> / day</p>
-                                    <p>Available: <b>@item.Available</b></p>
-
-                                    @if (item.Available > 0)
-                                    {
-                                        <button type="submit"
-                                                name="VehicleId"
-                                                value="@item.Vehicle.Id"
-                                                formaction="@Url.Action("Rent", "Home")"
-                                                class="btn btn-danger w-100">
-                                            RENT NOW
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <button type="button"
-                                                class="btn btn-secondary w-100"
-                                                disabled>
-                                            NOT AVAILABLE
-                                        </button>
-                                    }
+                                @if (!string.IsNullOrEmpty(item.Vehicle.Category))
+                                {
+                                    <span class="vcard-cat-badge">@item.Vehicle.Category</span>
+                                }
+                                @if (item.Available <= 0)
+                                {
+                                    <div class="vcard-unavail-overlay">
+                                        <span>Unavailable</span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="vcard-body">
+                                <div class="vcard-name-price">
+                                    <div>
+                                        <div class="vcard-brand">@item.Vehicle.Brand</div>
+                                        <div class="vcard-model">@item.Vehicle.Model</div>
+                                    </div>
+                                    <div class="vcard-price-block">
+                                        <div class="vcard-price-num">@item.Vehicle.DailyPrice€</div>
+                                        <span class="vcard-price-unit">per day</span>
+                                    </div>
                                 </div>
+                                <div class="vcard-avail @(item.Available > 0 ? "vcard-avail--ok" : "vcard-avail--none")">
+                                    <span class="vcard-avail-dot"></span>
+                                    @(item.Available > 0 ? $"{item.Available} available" : "Not available")
+                                </div>
+                                @if (item.Available > 0)
+                                {
+                                    <button type="submit"
+                                            name="VehicleId"
+                                            value="@item.Vehicle.Id"
+                                            formaction="@Url.Action("Rent", "Home")"
+                                            class="vcard-rent-btn vcard-rent-btn--active">
+                                        RENT NOW
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="vcard-rent-btn vcard-rent-btn--disabled" disabled>
+                                        NOT AVAILABLE
+                                    </button>
+                                }
                             </div>
                         </div>
                     }

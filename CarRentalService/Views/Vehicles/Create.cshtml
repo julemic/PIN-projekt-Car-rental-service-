@@ -8,7 +8,7 @@
 
     <h1>Add Vehicle</h1>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
 
         <div class="mb-2">
@@ -42,8 +42,8 @@
         </div>
 
         <div class="mb-2">
-            <label>ImageUrl (example: /images/skoda-octavia.png)</label>
-            <input class="form-control" asp-for="ImageUrl" />
+            <label>Vehicle Image</label>
+            <input type="file" name="imageFile" class="form-control" accept="image/jpeg,image/png,image/webp" />
         </div>
 
         <div class="form-check mb-3">

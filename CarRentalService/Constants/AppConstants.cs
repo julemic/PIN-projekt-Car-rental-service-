@@ -40,5 +40,8 @@ namespace CarRentalService.Constants
     {
         public const string BlogImagePath = "uploads/blog";
         public const string BlogImageUrlPrefix = "/uploads/blog/";
+
+        public const string VehicleImagePath = "uploads/vehicles";
+        public const string VehicleImageUrlPrefix = "/uploads/vehicles/";
     }
 }
