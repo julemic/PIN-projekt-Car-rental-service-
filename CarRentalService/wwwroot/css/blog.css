@@ -1,4 +1,4 @@
-/* ---- Shared blog card (used on home page preview) ---- */
+/* Shared blog card */
 
 .blog-card {
     background: #ffffff;
@@ -42,7 +42,7 @@
     }
 
 
-/* ---- Blog Index Page ---- */
+/* Blog Index stranica */
 
 .blog-page {
     max-width: 1200px;
@@ -268,7 +268,7 @@
 }
 
 
-/* ---- Blog Detail Page ---- */
+/*  Blog Detail stranica */
 
 .blog-detail {
     max-width: 760px;

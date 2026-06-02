@@ -1,4 +1,4 @@
-﻿@model CarRentalService.Models.AccidentReport
+@model CarRentalService.Models.AccidentReport
 @using CarRentalService.Models
 
 @{
@@ -6,94 +6,99 @@
     var rentals = ViewBag.UserRentals as List<Rental> ?? new List<Rental>();
 }
 
-<div class="container mt-4 mb-5 pb-5">
+<div class="ar-page">
 
-    <h2 class="mb-4 fw-bold">Accident Report</h2>
+    <div class="ar-header">
+        <h1 class="ar-title">Accident Report</h1>
+        <p class="ar-subtitle">Fill out all required fields and submit to our team.</p>
+    </div>
 
     @if (TempData["Msg"] != null)
     {
-        <div class="alert alert-success shadow-sm">@TempData["Msg"]</div>
+        <div class="ar-success-msg">
+            @TempData["Msg"]
+        </div>
     }
 
     <form method="post" asp-action="CreateAccidentReport">
         @Html.AntiForgeryToken()
 
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div asp-validation-summary="ModelOnly" class="ar-validation-summary"></div>
 
         <!-- SELECT RENTAL -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-light fw-bold">Rental</div>
-            <div class="card-body">
-
-                <label class="form-label">Select rental</label>
-                <select asp-for="RentalId" class="form-select" required>
-                    <option value="">-- Select rental --</option>
-                    @foreach (var r in rentals)
-                    {
-                        <option value="@r.Id">
-                            #@r.Id - @r.Vehicle?.Brand @r.Vehicle?.Model (@r.Pickup.ToString("dd.MM.yyyy") → @r.Return.ToString("dd.MM.yyyy"))
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="RentalId" class="text-danger"></span>
-
+        <div class="ar-section">
+            <div class="ar-section-header">
+                <span class="ar-step-badge">0</span>
+                <span class="ar-section-title">Select Rental</span>
+            </div>
+            <div class="ar-section-body">
+                <div class="ar-field">
+                    <label class="ar-label">Rental</label>
+                    <select asp-for="RentalId" class="ar-select" required>
+                        <option value="">— Select rental —</option>
+                        @foreach (var r in rentals)
+                        {
+                            <option value="@r.Id">
+                                #@r.Id — @r.Vehicle?.Brand @r.Vehicle?.Model (@r.Pickup.ToString("dd.MM.yyyy") → @r.Return.ToString("dd.MM.yyyy"))
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="RentalId" class="ar-error"></span>
+                </div>
             </div>
         </div>
 
-        <!-- DRIVER INFO (readonly from ApplicationUser) -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-light fw-bold">1) Driver Information</div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Full name</label>
-                        <input asp-for="FullName" class="form-control" readonly />
+        <!-- DRIVER INFO -->
+        <div class="ar-section">
+            <div class="ar-section-header">
+                <span class="ar-step-badge">1</span>
+                <span class="ar-section-title">Driver Information</span>
+            </div>
+            <div class="ar-section-body">
+                <div class="ar-grid-2">
+                    <div class="ar-field">
+                        <label class="ar-label">Full Name</label>
+                        <input asp-for="FullName" class="ar-input ar-input--readonly" readonly />
                     </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">OIB</label>
-                        <input asp-for="Oib" class="form-control" readonly />
-                        <span asp-validation-for="Oib" class="text-danger"></span>
+                    <div class="ar-field">
+                        <label class="ar-label">OIB</label>
+                        <input asp-for="Oib" class="ar-input ar-input--readonly" readonly />
+                        <span asp-validation-for="Oib" class="ar-error"></span>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Driver license number</label>
-                        <input asp-for="DriverLicenseNumber" class="form-control" readonly />
-                        <span asp-validation-for="DriverLicenseNumber" class="text-danger"></span>
+                    <div class="ar-field">
+                        <label class="ar-label">Driver License Number</label>
+                        <input asp-for="DriverLicenseNumber" class="ar-input ar-input--readonly" readonly />
+                        <span asp-validation-for="DriverLicenseNumber" class="ar-error"></span>
                     </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Phone</label>
-                        <input asp-for="Phone" class="form-control" readonly />
+                    <div class="ar-field">
+                        <label class="ar-label">Phone</label>
+                        <input asp-for="Phone" class="ar-input ar-input--readonly" readonly />
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- ACCIDENT DETAILS -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-light fw-bold">2) Accident Details</div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Accident date & time</label>
-                        <input asp-for="AccidentDate" type="datetime-local" class="form-control" required />
-                        <span asp-validation-for="AccidentDate" class="text-danger"></span>
+        <div class="ar-section">
+            <div class="ar-section-header">
+                <span class="ar-step-badge">2</span>
+                <span class="ar-section-title">Accident Details</span>
+            </div>
+            <div class="ar-section-body">
+                <div class="ar-grid-2">
+                    <div class="ar-field">
+                        <label class="ar-label">Accident Date & Time</label>
+                        <input asp-for="AccidentDate" type="datetime-local" class="ar-input" required />
+                        <span asp-validation-for="AccidentDate" class="ar-error"></span>
                     </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Location</label>
-                        <input asp-for="Location" class="form-control" required />
-                        <span asp-validation-for="Location" class="text-danger"></span>
+                    <div class="ar-field">
+                        <label class="ar-label">Location</label>
+                        <input asp-for="Location" class="ar-input" placeholder="City, street..." required />
+                        <span asp-validation-for="Location" class="ar-error"></span>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Weather conditions</label>
-                        <select asp-for="Weather" class="form-select">
+                    <div class="ar-field">
+                        <label class="ar-label">Weather Conditions</label>
+                        <select asp-for="Weather" class="ar-select">
                             <option>Clear</option>
                             <option>Rain</option>
                             <option>Snow</option>
@@ -101,10 +106,9 @@
                             <option>Storm</option>
                         </select>
                     </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Road conditions</label>
-                        <select asp-for="RoadCondition" class="form-select">
+                    <div class="ar-field">
+                        <label class="ar-label">Road Conditions</label>
+                        <select asp-for="RoadCondition" class="ar-select">
                             <option>Dry</option>
                             <option>Wet</option>
                             <option>Icy</option>
@@ -112,66 +116,65 @@
                         </select>
                     </div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Speed at moment (km/h)</label>
-                    <input asp-for="Speed" type="number" class="form-control" />
+                <div class="ar-grid-2">
+                    <div class="ar-field">
+                        <label class="ar-label">Speed at Moment (km/h)</label>
+                        <input asp-for="Speed" type="number" class="ar-input" placeholder="0" />
+                    </div>
                 </div>
-
-                <div class="form-check">
-                    <input asp-for="PoliceNotified" class="form-check-input" />
-                    <label class="form-check-label" asp-for="PoliceNotified">Police were notified</label>
+                <div class="ar-checkbox-wrap">
+                    <label class="ar-checkbox-label">
+                        <input asp-for="PoliceNotified" class="ar-checkbox" />
+                        <span class="ar-checkbox-text">Police were notified</span>
+                    </label>
                 </div>
             </div>
         </div>
 
         <!-- DAMAGE DETAILS -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-light fw-bold">3) Damage Details</div>
-            <div class="card-body">
-
-                <div class="mb-3">
-                    <label class="form-label">Damage description</label>
-                    <textarea asp-for="DamageDescription" class="form-control" rows="4" required></textarea>
-                    <span asp-validation-for="DamageDescription" class="text-danger"></span>
+        <div class="ar-section">
+            <div class="ar-section-header">
+                <span class="ar-step-badge">3</span>
+                <span class="ar-section-title">Damage Details</span>
+            </div>
+            <div class="ar-section-body">
+                <div class="ar-field" style="margin-bottom: 20px;">
+                    <label class="ar-label">Damage Description</label>
+                    <textarea asp-for="DamageDescription" class="ar-textarea" rows="4" placeholder="Describe the damage in detail..." required></textarea>
+                    <span asp-validation-for="DamageDescription" class="ar-error"></span>
                 </div>
-
-                <div class="form-check mb-3">
-                    <input asp-for="OtherPartyInvolved" class="form-check-input" id="otherPartyCheck" />
-                    <label class="form-check-label" for="otherPartyCheck">Other party involved?</label>
+                <div class="ar-checkbox-wrap">
+                    <label class="ar-checkbox-label">
+                        <input asp-for="OtherPartyInvolved" class="ar-checkbox" id="otherPartyCheck" />
+                        <span class="ar-checkbox-text">Other party involved?</span>
+                    </label>
                 </div>
-
-                <div id="otherPartySection" class="other-party-section">
-                    <div class="mb-3">
-                        <label class="form-label">Other party name</label>
-                        <input asp-for="OtherPartyName" class="form-control" />
+                <div id="otherPartySection" class="other-party-section ar-other-party">
+                    <div class="ar-grid-2">
+                        <div class="ar-field">
+                            <label class="ar-label">Other Party Name</label>
+                            <input asp-for="OtherPartyName" class="ar-input" />
+                        </div>
+                        <div class="ar-field">
+                            <label class="ar-label">Other Party Vehicle Plate</label>
+                            <input asp-for="OtherPartyPlate" class="ar-input" />
+                        </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Other party vehicle plate</label>
-                        <input asp-for="OtherPartyPlate" class="form-control" />
-                    </div>
                 </div>
-
             </div>
         </div>
 
-        <div class="text-end mt-4">
-
-            <!-- SAVE -->
+        <div class="ar-actions">
             <button type="submit"
-                    class="btn btn-danger btn-lg"
-                    formaction="@Url.Action("CreateAccidentReport", "Home")">
-                Submit Report
-            </button>
-
-            <!-- SAVE + PDF -->
-            <button type="submit"
-                    class="btn btn-outline-dark btn-lg"
+                    class="ar-btn ar-btn--secondary"
                     formaction="@Url.Action("CreateAccidentReportPdf", "Home")">
                 Save as PDF
             </button>
-
+            <button type="submit"
+                    class="ar-btn ar-btn--primary"
+                    formaction="@Url.Action("CreateAccidentReport", "Home")">
+                Submit Report
+            </button>
         </div>
 
     </form>

@@ -1,69 +1,86 @@
-﻿@model List<CarRentalService.Models.RentalViewModel>
+@model List<CarRentalService.Models.RentalViewModel>
+@using CarRentalService.Models
 
 @{
     ViewData["Title"] = "Rental History";
 }
 
-<div class="container mt-4 pb-5">
-    <h1 class="mb-4">Rental History</h1>
+<div class="admin-page">
+
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Rental History</h1>
+        @if (Model.Any())
+        {
+            <span class="rh-count">@Model.Count rental@(Model.Count != 1 ? "s" : "")</span>
+        }
+    </div>
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">
-            No previous rentals found.
+        <div class="admin-empty">
+            <p>No previous rentals found.</p>
         </div>
     }
     else
     {
-        <div class="row">
-            @foreach (var r in Model)
-            {
-                <div class="col-md-4 mb-4">
-                    <div class="card shadow-sm h-100 opacity-75">
-
-                        <div class="card-body">
-
-                            <h5 class="card-title">
-                                @r.Brand @r.Model
-                            </h5>
-
-                            <p class="mb-1">
-                                <strong>Pickup:</strong>
-                                @r.Pickup.ToString("dd.MM.yyyy HH:mm")
-                            </p>
-
-                            <p class="mb-1">
-                                <strong>Return:</strong>
-                                @r.Return.ToString("dd.MM.yyyy HH:mm")
-                            </p>
-
-                            <p class="mb-1">
-                                <strong>Insurance:</strong>
-                                @r.InsuranceName
-                            </p>
-
-                            <p class="mb-1">
-                                <strong>Total paid:</strong>
-                                @r.TotalPrice €
-                            </p>
-
-                            <p class="mb-1">
-                                <strong>Status:</strong>
-                                @r.Status
-                            </p>
-
-                            @if (r.Status == CarRentalService.Models.RentalStatus.Returned && r.ReturnedAt != null)
-                            {
-                                <p class="text-muted small mt-2">
-                                    Returned on:
-                                    @r.ReturnedAt.Value.ToString("dd.MM.yyyy HH:mm")
-                                </p>
-                            }
-
-                        </div>
-                    </div>
-                </div>
-            }
+        <div class="admin-table-wrap">
+            <table class="admin-vtable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Vehicle</th>
+                        <th>Pickup</th>
+                        <th>Return</th>
+                        <th>Days</th>
+                        <th>Insurance</th>
+                        <th>Total paid</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td class="vtable-id">@r.Id</td>
+                            <td>
+                                <div class="vtable-brand">@r.Brand @r.Model</div>
+                                <div class="vtable-model">@r.Category</div>
+                            </td>
+                            <td class="vtable-muted">@r.Pickup.ToString("dd.MM.yyyy")</td>
+                            <td class="vtable-muted">@r.Return.ToString("dd.MM.yyyy")</td>
+                            <td class="vtable-muted">@r.TotalDays</td>
+                            <td>
+                                <div class="vtable-brand" style="font-size:13px;">@r.InsuranceName</div>
+                                <div class="vtable-model">@r.InsurancePricePerDay € / day</div>
+                            </td>
+                            <td class="vtable-price">@r.TotalPrice €</td>
+                            <td>
+                                @if (r.Status == RentalStatus.Returned)
+                                {
+                                    <span class="vstatus vstatus--returned">Returned</span>
+                                    @if (r.ReturnedAt != null)
+                                    {
+                                        <div class="rh-returned-on">@r.ReturnedAt.Value.ToString("dd.MM.yyyy")</div>
+                                    }
+                                }
+                                else if (r.Status == RentalStatus.Cancelled)
+                                {
+                                    <span class="vstatus vstatus--cancelled">Cancelled</span>
+                                }
+                                else if (r.Status == RentalStatus.Reserved)
+                                {
+                                    <span class="vstatus vstatus--reserved">Reserved</span>
+                                }
+                                else
+                                {
+                                    <span class="vstatus vstatus--other">@r.Status</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     }
+
 </div>

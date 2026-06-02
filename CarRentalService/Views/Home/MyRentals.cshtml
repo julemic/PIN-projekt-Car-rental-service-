@@ -1,163 +1,160 @@
-﻿@model List<CarRentalService.Models.RentalViewModel>
+@model List<CarRentalService.Models.RentalViewModel>
 @using CarRentalService.Models
 
 @{
     ViewData["Title"] = "My Rentals";
 }
 
-<div class="container mt-4 mb-5">
-    <h1 class="mb-4 fw-bold">My Rentals</h1>
+<div class="admin-page">
+
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">My Rentals</h1>
+        @if (Model.Any())
+        {
+            <span class="rh-count">@Model.Count rental@(Model.Count != 1 ? "s" : "")</span>
+        }
+    </div>
 
     @if (TempData["Msg"] != null)
     {
-        <div class="alert alert-success shadow-sm">
-            @TempData["Msg"]
-        </div>
+        <div class="admin-alert">@TempData["Msg"]</div>
     }
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info shadow-sm">
-            You currently have no active rentals.
+        <div class="admin-empty">
+            <p>You currently have no active rentals.</p>
         </div>
     }
     else
     {
-        <div class="row g-4">
+        <div class="mr-grid">
             @foreach (var r in Model)
             {
-                <div class="col-lg-4 col-md-6">
-                    <div class="card shadow-sm h-100 border-0">
+                <div class="mr-card">
 
-                        <div class="card-body">
-
-                            <h5 class="card-title fw-bold mb-3">
-                                @r.Brand @r.Model
-                            </h5>
-
-                            <!-- STATUS BADGE -->
-                            <div class="mb-3">
-                                <span class="badge
-                                            @(r.Status == RentalStatus.Reserved ? "bg-primary" :
-                                                                            r.Status == RentalStatus.Returned ? "bg-success" :
-                                                                            r.Status == RentalStatus.Cancelled ? "bg-secondary" :
-                                                                            "bg-dark")">
-                            @r.Status
-                        </span>
+                    <!-- Header -->
+                    <div class="mr-card-header">
+                        <div>
+                            <div class="mr-car-name">@r.Brand @r.Model</div>
+                            <div class="mr-car-category">@r.Category</div>
+                        </div>
+                        @if (r.Status == RentalStatus.Reserved)
+                        {
+                            <span class="vstatus vstatus--reserved">Reserved</span>
+                        }
+                        else if (r.Status == RentalStatus.Returned)
+                        {
+                            <span class="vstatus vstatus--returned">Returned</span>
+                        }
+                        else if (r.Status == RentalStatus.Cancelled)
+                        {
+                            <span class="vstatus vstatus--cancelled">Cancelled</span>
+                        }
+                        else
+                        {
+                            <span class="vstatus vstatus--other">@r.Status</span>
+                        }
                     </div>
 
-                            <p class="mb-1">
-                                <strong>Pickup:</strong>
-                                @r.Pickup.ToString("dd.MM.yyyy")
-                            </p>
+                    <!-- Dates + Pricing -->
+                    <div class="mr-card-body">
+                        <div class="mr-info-block">
+                            <div class="mr-info-label">Pickup</div>
+                            <div class="mr-info-val">@r.Pickup.ToString("dd.MM.yyyy")</div>
+                            <div class="mr-date-arrow">↓</div>
+                            <div class="mr-info-label">Return</div>
+                            <div class="mr-info-val">@r.Return.ToString("dd.MM.yyyy")</div>
+                        </div>
 
-                            <p class="mb-2">
-                                <strong>Return:</strong>
-                                @r.Return.ToString("dd.MM.yyyy")
-                            </p>
+                        <div class="mr-divider"></div>
 
-                            <hr />
+                        <div class="mr-info-block">
+                            <div class="mr-info-label">Duration</div>
+                            <div class="mr-info-val">@r.TotalDays day@(r.TotalDays != 1 ? "s" : "")</div>
+                            <div class="mr-info-label" style="margin-top:10px;">Insurance</div>
+                            <div class="mr-info-val">@r.InsuranceName</div>
+                            <div class="mr-info-sub">@r.InsurancePricePerDay € / day</div>
+                        </div>
 
-                            <p class="mb-1">
-                                <strong>Insurance:</strong>
-                                @r.InsuranceName
-                                <span class="text-muted">
-                                    (@r.InsurancePricePerDay € / day)
-                                </span>
-                            </p>
+                        <div class="mr-divider"></div>
 
-                            <p class="mb-2">
-                                <strong>Total:</strong>
-                                <span class="fw-bold">
-                                    @r.TotalPrice €
-                                </span>
-                                <span class="text-muted">
-                                    (@r.TotalDays days × @r.TotalPricePerDay €)
-                                </span>
-                            </p>
+                        <div class="mr-info-block mr-info-block--total">
+                            <div class="mr-info-label">Rate</div>
+                            <div class="mr-info-val">@r.TotalPricePerDay € / day</div>
+                            <div class="mr-total-label">Total paid</div>
+                            <div class="mr-total-val">@r.TotalPrice €</div>
+                        </div>
+                    </div>
 
-                            <!-- PAYMENT INFO -->
+                    <!-- Payment strip -->
                     @if (r.Status == RentalStatus.Reserved)
-                            {
-                                <p class="mb-1 text-warning">
-                                    <strong>Deposit paid:</strong>
-                                    @r.DepositAmount €
-                                </p>
-
-                                <p class="mb-2">
-                                    <strong>Free cancellation until:</strong><br />
+                    {
+                        <div class="mr-payment-strip">
+                            <div class="mr-payment-item">
+                                <span class="mr-payment-key">Deposit paid</span>
+                                <span class="mr-payment-val">@r.DepositAmount €</span>
+                            </div>
+                            <div class="mr-payment-item">
+                                <span class="mr-payment-key">Free cancel until</span>
+                                <span class="mr-payment-val">
                                     @r.FreeCancellationUntil.ToString("dd.MM.yyyy")
-
                                     @if (r.CanFreeCancel)
                                     {
-                                        <span class="badge bg-success ms-2">
-                                            Refund available
-                                        </span>
+                                        <span class="mr-refund-badge mr-refund-badge--yes">Refund available</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-danger ms-2">
-                                            Non-refundable
-                                        </span>
+                                        <span class="mr-refund-badge mr-refund-badge--no">Non-refundable</span>
                                     }
-                                </p>
-                            }
-                            else if (r.Status == RentalStatus.Returned)
-                            {
-                                <p class="mb-1 text-success">
-                                    <strong>Deposit paid:</strong>
-                                    @r.DepositAmount €
-                                </p>
-
-                                <p class="mb-1 text-success">
-                                    <strong>Fully paid:</strong> Yes
-                                </p>
-                            }
-                            else if (r.Status == RentalStatus.Cancelled)
-                            {
-                                <p class="mb-1 text-muted">
-                                    Reservation cancelled.
-                                </p>
-                            }
-
+                                </span>
+                            </div>
                         </div>
-
-                        <!-- ACTION BUTTONS -->
-                        <div class="card-footer bg-white border-top-0 d-flex gap-2 flex-wrap">
-
-                            @if (r.Status == RentalStatus.Reserved)
-                            {
-                                <form asp-action="CancelReservation" method="post">
-                                    <input type="hidden" name="rentalId" value="@r.Id" />
-
-                                    <button type="submit" class="btn btn-danger">
-                                        Cancel Reservation
-                                    </button>
-                                </form>
-
-
-                                <form method="post"
-                                      asp-action="ReturnCar"
-                                      class="m-0">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden"
-                                           name="rentalId"
-                                           value="@r.Id" />
-
-                                    <button type="submit"
-                                            class="btn btn-success btn-sm">
-                                        Return car
-                                    </button>
-                                </form>
-                            }
-
+                    }
+                    else if (r.Status == RentalStatus.Returned)
+                    {
+                        <div class="mr-payment-strip">
+                            <div class="mr-payment-item">
+                                <span class="mr-payment-key">Deposit paid</span>
+                                <span class="mr-payment-val">@r.DepositAmount €</span>
+                            </div>
+                            <div class="mr-payment-item">
+                                <span class="mr-payment-key">Payment</span>
+                                <span class="mr-payment-val">Fully paid</span>
+                            </div>
                         </div>
+                    }
+                    else if (r.Status == RentalStatus.Cancelled)
+                    {
+                        <div class="mr-payment-strip mr-payment-strip--muted">
+                            <div class="mr-payment-item">
+                                <span class="mr-payment-key">Reservation cancelled</span>
+                            </div>
+                        </div>
+                    }
 
-                    </div>
+                    <!-- Actions -->
+                    @if (r.Status == RentalStatus.Reserved)
+                    {
+                        <div class="mr-card-footer">
+                            <form asp-action="ReturnCar" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="rentalId" value="@r.Id" />
+                                <button type="submit" class="mr-btn mr-btn--dark">Return car</button>
+                            </form>
+                            <form asp-action="CancelReservation" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="rentalId" value="@r.Id" />
+                                <button type="submit" class="mr-btn mr-btn--ghost">Cancel reservation</button>
+                            </form>
+                        </div>
+                    }
+
                 </div>
             }
         </div>
     }
+
 </div>
 
 @section Scripts {

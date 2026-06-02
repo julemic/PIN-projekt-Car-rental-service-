@@ -58,3 +58,254 @@ body {
 .other-party-section {
     display: none;
 }
+
+/* ---- Accident Report ---- */
+
+.ar-page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 16px 80px;
+}
+
+.ar-header {
+    background: #1f2937;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+}
+
+.ar-title {
+    font-size: 30px;
+    font-weight: 800;
+    color: white;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.ar-subtitle {
+    color: #9ca3af;
+    font-size: 13px;
+    margin: 4px 0 0;
+}
+
+.ar-success-msg {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ar-validation-summary {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.ar-section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    border: 1px solid #f3f4f6;
+    margin-bottom: 18px;
+    overflow: hidden;
+}
+
+.ar-section-header {
+    background: #1f2937;
+    padding: 13px 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ar-step-badge {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ff3c00;
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ar-section-title {
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.ar-section-body {
+    padding: 22px 22px 20px;
+}
+
+.ar-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.ar-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ar-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+}
+
+.ar-input,
+.ar-select,
+.ar-textarea {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 14px;
+    color: #1f2937;
+    background: white;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-family: inherit;
+    width: 100%;
+}
+
+.ar-input:focus,
+.ar-select:focus,
+.ar-textarea:focus {
+    border-color: #1f2937;
+    box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.08);
+}
+
+.ar-input--readonly {
+    background: #f9fafb;
+    color: #6b7280;
+    cursor: default;
+}
+
+.ar-textarea {
+    resize: vertical;
+    min-height: 96px;
+}
+
+.ar-error {
+    font-size: 12px;
+    color: #dc2626;
+    font-weight: 500;
+}
+
+.ar-checkbox-wrap {
+    margin-top: 4px;
+}
+
+.ar-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.ar-checkbox {
+    width: 17px;
+    height: 17px;
+    accent-color: #1f2937;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ar-checkbox-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.ar-other-party {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.ar-other-party .ar-grid-2 {
+    margin-bottom: 0;
+}
+
+.ar-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.ar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.2s ease;
+    letter-spacing: 0.02em;
+    font-family: inherit;
+}
+
+.ar-btn--primary {
+    background: #ff3c00;
+    color: white;
+}
+
+.ar-btn--primary:hover {
+    background: #e53200;
+    transform: translateY(-1px);
+    color: white;
+}
+
+.ar-btn--secondary {
+    background: #1f2937;
+    color: white;
+}
+
+.ar-btn--secondary:hover {
+    background: #374151;
+    transform: translateY(-1px);
+    color: white;
+}
+
+@media (max-width: 640px) {
+    .ar-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .ar-actions {
+        flex-direction: column-reverse;
+    }
+
+    .ar-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
