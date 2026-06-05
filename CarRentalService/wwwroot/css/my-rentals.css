@@ -1,0 +1,237 @@
+/* ---- My Rentals & Rental History Cards ---- */
+
+.mr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+}
+
+.mr-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    border: 1px solid #f3f4f6;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.mr-card-header {
+    background: #1f2937;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.mr-car-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+    line-height: 1.2;
+}
+
+.mr-car-category {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.mr-card-body {
+    padding: 18px 20px;
+    display: flex;
+    gap: 0;
+    flex: 1;
+}
+
+.mr-info-block {
+    flex: 1;
+    padding: 0 16px 0 0;
+}
+
+.mr-info-block + .mr-info-block {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.mr-info-block--total {
+    padding-right: 0;
+}
+
+.mr-divider {
+    width: 1px;
+    background: #f3f4f6;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.mr-info-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9ca3af;
+    margin-bottom: 3px;
+}
+
+.mr-info-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+    line-height: 1.3;
+}
+
+.mr-info-sub {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+    margin-top: 1px;
+}
+
+.mr-date-arrow {
+    font-size: 12px;
+    color: #d1d5db;
+    margin: 5px 0;
+    line-height: 1;
+}
+
+.mr-total-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9ca3af;
+    margin-top: 12px;
+    margin-bottom: 3px;
+}
+
+.mr-total-val {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1f2937;
+    line-height: 1;
+}
+
+.mr-payment-strip {
+    background: #f9fafb;
+    border-top: 1px solid #f3f4f6;
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mr-payment-strip--muted {
+    background: #f9fafb;
+}
+
+.mr-payment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.mr-payment-key {
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.mr-payment-val {
+    color: #1f2937;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mr-refund-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+}
+
+.mr-refund-badge--yes {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.mr-refund-badge--no {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.mr-card-footer {
+    padding: 14px 20px;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.mr-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.2rem;
+    font-size: 12px;
+    font-weight: 500;
+    border: solid 1px #1f2937;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    font-family: inherit;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    box-shadow: inset 0 0 0 2px #ffffff;
+}
+
+.mr-btn--dark {
+    background: #1f2937;
+    color: white;
+}
+
+.mr-btn--dark:hover {
+    background: #374151;
+    color: white;
+    box-shadow: inset 0 0 0 4px #ffffff;
+    text-decoration: underline;
+}
+
+.mr-btn--ghost {
+    background: #d1d5db;
+    color: #1f2937;
+}
+
+.mr-btn--ghost:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+    box-shadow: inset 0 0 0 4px #ffffff;
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .mr-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mr-card-body {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .mr-divider {
+        width: 100%;
+        height: 1px;
+    }
+
+    .mr-info-block,
+    .mr-info-block + .mr-info-block {
+        padding: 0;
+    }
+}

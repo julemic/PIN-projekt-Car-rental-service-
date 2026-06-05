@@ -52,6 +52,43 @@
     cursor: pointer;
 }
 
+.date-display-wrap {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.date-icon {
+    color: #9ca3af;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.date-display-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+    font-family: inherit;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.date-display-text.is-placeholder {
+    font-weight: 400;
+    color: #9ca3af;
+}
+
+.date-overlay-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+    border: none;
+}
+
 .search-divider {
     width: 1px;
     height: 44px;
@@ -281,23 +318,68 @@
 }
 
 .cat-pill {
-    background: white;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 24px;
-    padding: 7px 16px;
-    font-size: 12px;
+    display: inline-block;
+    padding: 8px 20px;
+    border: 1px solid #4f4f4f;
+    border-radius: 4px;
+    transition: all 0.2s ease-in;
+    position: relative;
+    overflow: hidden;
+    font-size: 13px;
     font-weight: 600;
-    color: #6b7280;
     cursor: pointer;
-    transition: all 0.2s ease;
-    letter-spacing: 0.02em;
+    color: #1f2937;
+    background: white;
     font-family: inherit;
+    letter-spacing: 0.02em;
+    z-index: 1;
+}
+
+.cat-pill:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) scaleY(1) scaleX(1.25);
+    top: 100%;
+    width: 140%;
+    height: 180%;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    display: block;
+    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+    z-index: -1;
+}
+
+.cat-pill:after {
+    content: "";
+    position: absolute;
+    left: 55%;
+    transform: translateX(-50%) scaleY(1) scaleX(1.45);
+    top: 180%;
+    width: 160%;
+    height: 190%;
+    background-color: #ff3c00;
+    border-radius: 50%;
+    display: block;
+    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+    z-index: -1;
 }
 
 .cat-pill:hover {
-    border-color: #ff3c00;
-    color: #ff3c00;
-    background: rgba(255, 60, 0, 0.03);
+    color: #ffffff;
+    border: 1px solid #ff3c00;
+}
+
+.cat-pill:hover:before {
+    top: -35%;
+    background-color: #ff3c00;
+    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+}
+
+.cat-pill:hover:after {
+    top: -45%;
+    background-color: #ff3c00;
+    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
 }
 
 .cars-sort-select {

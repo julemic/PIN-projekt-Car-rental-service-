@@ -119,7 +119,8 @@
                 <div class="ar-grid-2">
                     <div class="ar-field">
                         <label class="ar-label">Speed at Moment (km/h)</label>
-                        <input asp-for="Speed" type="number" class="ar-input" placeholder="0" />
+                        <input asp-for="Speed" type="number" class="ar-input" placeholder="0" min="0" />
+                        <span asp-validation-for="Speed" class="text-danger" style="font-size:0.8rem;"></span>
                     </div>
                 </div>
                 <div class="ar-checkbox-wrap">

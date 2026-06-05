@@ -18,13 +18,25 @@
         <div class="search-panel">
             <div class="search-field">
                 <label asp-for="Search.Pickup" class="search-label">Pickup Date</label>
-                <input asp-for="Search.Pickup" type="date" class="search-input" />
+                <div class="date-display-wrap" onclick="document.getElementById('pickup-input').showPicker()">
+                    <svg class="date-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                    </svg>
+                    <span class="date-display-text" id="pickup-text">Day of Pick Up</span>
+                    <input asp-for="Search.Pickup" type="date" id="pickup-input" class="date-overlay-input" />
+                </div>
                 <span asp-validation-for="Search.Pickup" class="search-error"></span>
             </div>
             <div class="search-divider"></div>
             <div class="search-field">
                 <label asp-for="Search.Return" class="search-label">Return Date</label>
-                <input asp-for="Search.Return" type="date" class="search-input" />
+                <div class="date-display-wrap" onclick="document.getElementById('return-input').showPicker()">
+                    <svg class="date-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                    </svg>
+                    <span class="date-display-text" id="return-text">Day of Return</span>
+                    <input asp-for="Search.Return" type="date" id="return-input" class="date-overlay-input" />
+                </div>
                 <span asp-validation-for="Search.Return" class="search-error"></span>
             </div>
             <div class="search-action">

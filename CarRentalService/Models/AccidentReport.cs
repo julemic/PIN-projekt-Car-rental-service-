@@ -36,6 +36,7 @@ namespace CarRentalService.Models
         public string? Location { get; set; }
         public string? Weather { get; set; }
         public string? RoadCondition { get; set; }
+        [Range(0, int.MaxValue, ErrorMessage = "Brzina ne može biti negativna.")]
         public int? Speed { get; set; }
         public bool PoliceNotified { get; set; }
 
